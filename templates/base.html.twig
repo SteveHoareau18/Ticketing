@@ -1,16 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr-FR" data-theme="mytheme">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Ticketing{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
         {% endblock %}
 
         {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
-    <body>
+    <body class="h-full w-full max-h-full max-w-full">
+        <div class="navbar bg-accent mb-3">
+            <div class="flex-1">
+                <a class="btn btn-ghost normal-case text-xl" href="{{ path('app_main') }}">Plateforme Ticketing</a>
+            </div>
+            {% if app.user %}
+                <div class="flex-none gap-2">
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" class="btn btn-ghost btn-circle avatar">
+                            <div class="w-10 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path>
+                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                            <li><a href="{{ path('app_settings') }}">Paramètre</a></li>
+                            <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% for message in app.session.flashBag.get('fail') %}
+            <div class="badge bg-error text-lime-50 w-full h-10">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+                    </svg>
+                </div>
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.session.flashBag.get('success') %}
+            <div class="badge bg-success text-lime-50 w-full h-10">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"></path>
+                    </svg>
+                </div>
+                {{ message }}
+            </div>
+        {% endfor %}
         {% block body %}{% endblock %}
     </body>
 </html>
