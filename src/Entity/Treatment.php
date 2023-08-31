@@ -25,9 +25,8 @@ class Treatment
     #[ORM\Column(type: Types::TEXT)]
     private ?string $observations = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Status $status = null;
+    #[ORM\Column(nullable: true)]
+    private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $startDate = null;
@@ -76,12 +75,12 @@ class Treatment
         return $this;
     }
 
-    public function getStatus(): ?status
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(status $status): static
+    public function setStatus(?string $status): static
     {
         $this->status = $status;
 

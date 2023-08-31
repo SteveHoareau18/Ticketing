@@ -1,0 +1,18 @@
+<div class="flex flex-col justify-center items-center align-middle">
+    <div class="card w-96 bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <datalist id="serviceLst">
+                    {% for service in serviceLst %}
+                        <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </datalist>
+                <div class="mt-3">
+                    <a class="btn btn-info" href="{{ path('app_main') }}">Retour</a>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>

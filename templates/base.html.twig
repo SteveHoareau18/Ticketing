@@ -19,6 +19,9 @@
             </div>
             {% if app.user %}
                 <div class="flex-none gap-2">
+                    <div>
+                        {{ app.user.userIdentifier }}
+                    </div>
                     <div class="dropdown dropdown-end">
                         <div tabindex="0" class="btn btn-ghost btn-circle avatar">
                             <div class="w-10 rounded-full">

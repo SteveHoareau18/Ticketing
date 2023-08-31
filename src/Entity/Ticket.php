@@ -38,6 +38,9 @@ class Ticket
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
+    #[ORM\Column]
+    private ?bool $transfered = null;
+
     public function __construct()
     {
         $this->treatments = new ArrayCollection();
@@ -146,6 +149,18 @@ class Ticket
     public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function isTransfered(): ?bool
+    {
+        return $this->transfered;
+    }
+
+    public function setTransfered(bool $transfered): static
+    {
+        $this->transfered = $transfered;
 
         return $this;
     }

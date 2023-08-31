@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticketing | Ouvrir un nouveau ticket{% endblock %}
+
+{% block body %}
+    {{ include('ticket/treatment/_form.html.twig',{'ticket':ticket}) }}
+{% endblock %}

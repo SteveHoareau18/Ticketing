@@ -20,20 +20,38 @@
         </div>
     {% else %}
         <div>
-            <a class="btn btn-secondary">CRÉER UN TICKET</a>
-            <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
-            <div>
-                {% for ticket in app.user.service.ticket %}
-                    <div class="card w-96 bg-base-100 shadow-xl">
-                        <div class="card-body">
-                            <h2 class="card-title">{{ ticket.id }}</h2>
-                            <p>If a dog chews shoes whose shoes does he choose?</p>
-                            <div class="card-actions justify-end">
-                                <button class="btn btn-primary">Buy Now</button>
+            <a class="btn btn-secondary" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
+            <a class="btn btn-success" href="{{ path('app_ticket_new') }}">VOIR LES TICKETS DE MON SERVICE</a>
+            <a class="btn btn-ghost" href="{{ path('app_ticket_new') }}">VOIR LES TICKETS QUE J'AI CREER</a>
+            <div class="text-center">
+                <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
+                <div class="grid grid-cols-4 mt-3 gap-4">
+                    {% for ticket in app.user.service.ticket %}
+                        <div class="card bg-gray-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title">
+                                    <span class="badge badge-warning">
+                                        {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
+                                            EN ATTENTE
+                                        {% else %}
+                                            {{ ticket.treatments.last.status }}
+                                        {% endif %}</span>
+                                    <span class="badge badge-ghost">{{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                                    <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                                <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                                <p>Traitement: {{ ticket.treatments|length }}</p>
+                                <div class="card-actions justify-end">
+                                    <a class="btn btn-primary" href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     {% endif %}
