@@ -17,11 +17,11 @@
                 </div>
             {% endif %}
 
-        {#    {% if app.user %}#}
-        {#        <div class="mb-3">#}
-        {#            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>#}
-        {#        </div>#}
-        {#    {% endif %}#}
+            {#    {% if app.user %}#}
+            {#        <div class="mb-3">#}
+            {#            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>#}
+            {#        </div>#}
+            {#    {% endif %}#}
 
             <h1 class="mb-3 mt-3 font-extrabold text-center">Connectez-vous !</h1>
             <label for="inputUsername" class="label font-bold w-full">Identifiant</label>
@@ -34,6 +34,7 @@
             <button class="btn btn-primary mt-3 w-full" type="submit">
                 Connexion
             </button>
+            <a href="{{ path('app_lost_password') }}" class="link">Mot de passe oublié ?</a>
         </form>
     </div>
 {% endblock %}

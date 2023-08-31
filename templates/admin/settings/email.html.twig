@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètre e-mail{% endblock %}
+
+{% block body %}
+    <div class="row p-2">
+        <div class="col text-center">
+            <a href="{{ path('app_main') }}" class="btn btn-info">Retour</a>
+        </div>
+        {% if alreadyExist %}
+            <div class="col text-center">
+                <form method="post" action="{{ path('app_configuration_mail_test') }}">
+                    <label>
+                        <input hidden name="_csrf_token" type="text" value="{{ csrf_token('test-parameter') }}">
+                    </label>
+                    <button type="submit" class="btn btn-ghost">Tester</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="row row-cols-1">
+        <div class="col">
+            <div class="card w-100 h-100" >
+                {{ form_start(emailConfig) }}
+                <div class="card-body text-center items-center justify-center">
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.subject) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.login) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.password) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.smtpAddress) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.smtpPort) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.smtpTls) }}
+                    </div>
+                    <div class="form-control w-full max-w-xs">
+                        {{ form_row(emailConfig.ccAddress) }}
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    {{ form_widget(emailConfig.submit) }}
+                </div>
+                {{ form_end(emailConfig) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

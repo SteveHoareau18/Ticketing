@@ -2,21 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\MailConfiguration;
 use App\Entity\Service;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\ByteString;
@@ -61,11 +61,31 @@ class UserController extends AbstractController
                     $user->setActive(false);
                     $password =  ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
                     $password .= ByteString::fromRandom(4, '0123456789')->toString();
-                    $user->setPassword($hasher->hashPassword($user, $password));
-                    $manager->persist($user);
-                    $manager->flush();
-                    $this->addFlash("success", "Utilisateur " . $user->getUsername() . " crée avec succès avec le mot de passe par défaut : ".$password);
-                    return $this->redirectToRoute("app_user");
+                    $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
+                    if($mailConfiguration != null) {
+                        $user->setPassword($hasher->hashPassword($user, $password));
+                        if(!$user->isActive())$user->setActive(true);
+                        $manager->persist($user);
+                        $manager->flush();
+                        $this->addFlash("success", "Paramètre enregistré.");
+
+                        $mailService = new MailService($mailConfiguration);
+                        $email = (new Email())
+                            ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
+                            ->to($user->getEmail())
+                            ->subject('Creation de votre compte // PLATEFORME TICKETING')
+                            ->html("<p>Bonjour, votre compte a été crée avec l'identifiant ".$user->getUsername()." et le mot de passe ".$password.'</p><p>Celui-ci doit rester confidentiel !</p>');
+
+                        foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
+                            $email->addCc(new Address(trim($address)));
+                        }
+
+                        $mailService->getMailer()->send($email);
+                        $this->addFlash("success", "Utilisateur " . $user->getUsername() . " crée avec succès. Le mot de passe lui a été envoyé par mail");
+                        return $this->redirectToRoute("app_user");
+                    }else {
+                        $this->addFlash("fail", "Une erreur est intervenue...");
+                    }
                 }
             }
         }

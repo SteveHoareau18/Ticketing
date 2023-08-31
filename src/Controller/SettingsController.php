@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\MailConfiguration;
 use App\Entity\User;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\ByteString;
@@ -30,11 +33,31 @@ class SettingsController extends AbstractController
             $password = ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
             $password .= ByteString::fromRandom(4, '0123456789')->toString();
             $user = $manager->getRepository(User::class)->findOneBy(['username'=>$this->getUser()->getUserIdentifier()]);
-            $user->setPassword($hasher->hashPassword($user, $password));
-            if(!$user->isActive())$user->setActive(true);
-            $manager->persist($user);
-            $manager->flush();
-            $this->addFlash("success", "Paramètre enregistré. Votre nouveau mot de passe est : " . $password);
+            $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
+            if($mailConfiguration != null) {
+                $user->setPassword($hasher->hashPassword($user, $password));
+                if(!$user->isActive())$user->setActive(true);
+                $manager->persist($user);
+                $manager->flush();
+
+                $mailService = new MailService($mailConfiguration);
+                $email = (new Email())
+                    ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
+                    ->to($user->getEmail())
+                    ->subject('Un parametre a ete change dans votre compte // PLATEFORME TICKETING')
+                    ->html('<p>Bonjour, voici votre nouveau mot de passe: '.$password.'</p><strong>Celui-ci doit rester confidentiel !</strong>');
+
+                foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
+                    $email->addCc(new Address(trim($address)));
+                }
+
+                $mailService->getMailer()->send($email);
+                $this->addFlash('success', 'Votre nouveau mot de passe vous a été en envoyé par mail');
+            }else {
+                $this->addFlash("fail", "Une erreur est intervenue...");
+            }
+        }else{
+            $this->addFlash("fail", "Une erreur est intervenue...");
         }
         return $this->redirectToRoute("app_settings");
     }
