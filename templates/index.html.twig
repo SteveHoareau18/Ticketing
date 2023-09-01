@@ -15,17 +15,34 @@
         </div>
     {% endif %}
     {% if "ROLE_ADMIN" in app.user.roles %}
-        <div>
-            <a href="{{ path('app_user') }}" class="btn btn-secondary">GESTION DES UTILISATEURS</a>
+        <div class="grid grid-cols-3 gap-4">
+            {% for service in serviceLst %}
+                <div class="bg-gray-300 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="badge badge-secondary">{{ service.name }}</span>
+                    </div>
+                    <div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-left: 20%">
+                        <canvas id="canvaService{{ service.id }}"></canvas>
+                    </div>
+                    <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
+                        <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>
+                        <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>
+                        <span  id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mt-3 ml-2 mb-3 grid grid-cols-3 gap-4">
+            <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
         </div>
     {% else %}
         <div>
             <a class="btn btn-secondary" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
-            <a class="btn btn-success" href="{{ path('app_ticket_new') }}">VOIR LES TICKETS DE MON SERVICE</a>
+            <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
             <a class="btn btn-ghost" href="{{ path('app_ticket_new') }}">VOIR LES TICKETS QUE J'AI CREER</a>
             <div class="text-center">
                 <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
-                <div class="grid grid-cols-4 mt-3 gap-4">
+                <div class="grid grid-cols-3 mt-3 gap-4">
                     {% for ticket in app.user.service.ticket %}
                         <div class="card bg-gray-200 shadow-xl">
                             <div class="card-body">
@@ -36,7 +53,8 @@
                                         {% else %}
                                             {{ ticket.treatments.last.status }}
                                         {% endif %}</span>
-                                    <span class="badge badge-ghost">{{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                                    <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                                    <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
                                     <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
                                 <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
                                 <p>Traitement: {{ ticket.treatments|length }}</p>
@@ -55,4 +73,56 @@
             </div>
         </div>
     {% endif %}
+    <script>
+        document.addEventListener("DOMContentLoaded",()=>{
+            let ctx;
+            let chart;
+            let ms = [];
+            {% for service in serviceLst %}
+                ctx = document.getElementById('canvaService{{ service.id }}');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/count-tickets/{{ service.id }}/',
+                    data: {_csrf_token: "{{ csrf_token('api-count'~service.id) }}" },
+                    success: function(response) {
+                        if(response!==500) {
+                            ms["{{service.id}}"].data.datasets[0].data[0] = parseFloat(response[0]);
+                            ms["{{service.id}}"].data.datasets[0].data[1] = parseFloat(response[1]);
+                            ms["{{service.id}}"].data.datasets[0].data[2] = parseFloat(response[2]);
+                            ms["{{service.id}}"].update();
+                            $('#waitingBadgeIdService{{ service.id }}').html("Ticket EN ATTENTE: "+response[0]);
+                            $('#inProgressBadgeIdService{{ service.id }}').html("Ticket EN COURS: "+response[1]);
+                            $('#closeBadgeIdService{{ service.id }}').html("Ticket FERMÉ: "+response[2]);
+                        }else{
+                            console.error('Erreur lors de la requête. (500)');
+                        }
+                    },
+                    error: function() {
+                        console.error('Erreur lors de la requête.');
+                    }
+                });
+
+                chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                        ],
+                        datasets: [{
+                            label: '',
+                            data: [1,1,1],
+                            backgroundColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)',
+                                'rgb(123,255,86)'
+                            ],
+                            hoverOffset: 2
+                        }],
+                    }
+                });
+                ms["{{ service.id }}"] = chart;
+            {% endfor %}
+            console.log(ms);
+        });
+    </script>
 {% endblock %}

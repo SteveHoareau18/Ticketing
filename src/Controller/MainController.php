@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\MailConfiguration;
+use App\Entity\Service;
+use App\Entity\Ticket;
+use App\Entity\Treatment;
 use App\Entity\User;
 use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -23,8 +27,12 @@ class MainController extends AbstractController
     {
         if(!$this->getUser()) return $this->redirectToRoute("app_login");
         $user = $managerRegistry->getRepository(User::class)->findOneBy(['username'=>$this->getUser()->getUserIdentifier()]);
+        //nombre de ticket pour le service qui a comme dernier status 'en cours'
+//        $tickets = array();
+        $serviceLst = $managerRegistry->getRepository(Service::class)->findAll();
         return $this->render('index.html.twig', [
-
+            'serviceLst'=>$serviceLst,
+//            'tickets'=>$tickets
         ]);
     }
 
@@ -68,5 +76,40 @@ class MainController extends AbstractController
         return $this->render('security/lost_password.html.twig', [
 
         ]);
+    }
+
+    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST'])]
+    public function apiCount(Request $request, EntityManagerInterface $manager,$service): JsonResponse
+    {
+        if($request->request->has('_csrf_token')&&$this->isCsrfTokenValid('api-count'.$service,$request->request->get('_csrf_token'))){
+            $service = $manager->getRepository(Service::class)->find($service);
+            if($service != null){
+               $treatments = $manager->getRepository(Treatment::class)->findBy(['status'=>'Fermé']);
+               $nClose = 0;
+               foreach ($treatments as $treatment){
+                   if($treatment->getTicket()->getService()->getId() == $service->getId()) $nClose+=1;
+               }
+
+               $treatments = $manager->getRepository(Treatment::class)->findBy(['status'=>'EN COURS']);
+               $nInProgress = 0;
+               foreach ($treatments as $treatment){
+                   if($treatment->getTicket()->getService()->getId() == $service->getId()) $nInProgress+=1;
+               }
+
+               $treatments = $manager->getRepository(Treatment::class)->findBy(['status'=>'EN ATTENTE']);
+               $nWaiting = 0;
+               foreach ($treatments as $treatment){
+                   if($treatment->getTicket()->getService()->getId() == $service->getId()) $nWaiting+=1;
+               }
+               if($nWaiting == 0){
+                   $tickets = $manager->getRepository(Ticket::class)->findBy(['service'=>$service]);
+                   foreach ($tickets as $ticket){
+                       if(sizeof($ticket->getTreatments())==0||sizeof($manager->getRepository(Treatment::class)->findBy(['status'=>'EN ATTENTE', 'ticket'=>$ticket]))==0)$nWaiting+=1;
+                   }
+               }
+              return new JsonResponse(array($nWaiting,$nInProgress,$nClose));
+            }
+        }
+        return new JsonResponse(500);
     }
 }

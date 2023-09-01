@@ -23,5 +23,10 @@
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production --progress"
+    },
+    "dependencies": {
+        "chart.js": "^4.4.0",
+        "chartjs": "^0.3.24",
+        "jquery": "^3.7.1"
     }
 }

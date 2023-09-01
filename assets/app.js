@@ -7,3 +7,7 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
+import Chart from 'chart.js/auto';
+global.Chart = Chart;
+import $ from 'jquery';
+global.$ = $;

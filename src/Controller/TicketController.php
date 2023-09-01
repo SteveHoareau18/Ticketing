@@ -161,6 +161,9 @@ class TicketController extends AbstractController
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     #[Route('/transfer/{id}/for/{service}', name: 'app_ticket_transfer')]
     public function transfer(Request $request, EntityManagerInterface $registry, $id, $service): Response
     {
@@ -174,7 +177,10 @@ class TicketController extends AbstractController
         if($ticket->getService()->getId() == $service->getId()) return $this->redirectToRoute("app_main");
         if($ticket->getService()->getId() == $user->getService()->getId()) {
             $ticket->setService($service);
+            $ticket->setTransfered(true);
             $ticket->getTreatments()->last()->setStatus("TRANSFÉRÉ // EN ATTENTE");
+            $datetime = new \DateTime("now",new DateTimeZone($_ENV['DATETIMEZONE']));
+            $ticket->setProblem("Transféré par le service ".$user->getService()->getName() ." le ". $datetime->format("d/m/Y H:i")." | ".$ticket->getProblem());
             $registry->persist($ticket);
             $registry->flush();
             $this->addFlash('success',"Ticket transféré avec succès au service ".$service->getName());
