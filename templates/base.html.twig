@@ -15,7 +15,7 @@
     <body class="h-full w-full max-h-full max-w-full">
         <div class="navbar bg-accent mb-3">
             <div class="flex-1">
-                <a class="btn btn-ghost normal-case text-xl" href="{{ path('app_main') }}">Plateforme Ticketing</a>
+                <a class="btn btn-ghost normal-case text-xl" href="{{ path('app_main') }}">Plateforme Ticketing{% if app.user and "ROLE_ADMIN" in app.user.roles %} (admin){% endif %}</a>
             </div>
             {% if app.user %}
                 <div class="flex-none gap-2">

@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticketing | TICKET T°{{ ticket.id }}{% endblock %}
+
+{% block body %}
+    <div class="flex flex-col justify-center items-center align-middle">
+        <a href="{{ path('app_historic_by_service',{'service':service.id}) }}" class="btn btn-info mb-3">Retour</a>
+        <div class="text-center">
+            <span class="badge badge-primary mb-3">Service {{ service.name }}</span>
+        </div>
+        <div class="card bg-gray-200 shadow-xl w-100">
+            <div class="card-body text-center">
+                <h2 class="card-title text-center">
+                    <span class="badge badge-ghost">Ouvert le {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                    {% if ticket.resultDate is not null %}
+                        <span class="badge badge-ghost">Fermer le {{ ticket.resultDate|date('d/m/Y H:i') }}</span>
+                    {% endif %}
+                    <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                    <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                    <p>Traitement: {{ ticket.treatments|length }}</p>
+                    <p>Raison d'ouverture: {{ ticket.problem }}</p>
+                {% if ticket.result is not null %}
+                        <h3><span class="badge badge-primary ">Fermé par: {{ ticket.treatments.last.user.firstname ~ " " ~ticket.treatments.last.user.name }}</span>
+                            <span class="badge badge-outline">Raison de fermeture: {{ ticket.result }}</span></h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-col grid-cols-3 gap-4 justify-center items-center align-middle mt-3">
+        {% for treatment in ticket.treatments %}
+            <div class="card bg-gray-200 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <span class="badge badge-warning">{{ treatment.status }}</span>
+                        <span class="badge badge-ghost">Commencé le {{ treatment.startDate|date('d/m/Y H:i') }}</span><span class="badge badge-ghost">{% if treatment.endDate is not null %}Fini le {{ treatment.endDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span></h2>
+                    <p>Traité par {{ treatment.user.firstname ~ " " ~ treatment.user.name }}</p>
+                    <p>Observations: {{ treatment.observations }}</p>
+                </div>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-error" onclick="relanceModal{{ treatment.id }}.showModal()">Relancer</button>
+                    <dialog id="relanceModal{{ treatment.id }}" class="modal">
+                        <form method="post" class="modal-box" action="{{ path('app_historic_by_service_relance_treatment_for_ticket',{'service':service.id,'id':ticket.id,'treatment':treatment.id}) }}">
+                            <h3 class="font-bold text-lg">Vous allez envoyer un mail à {{ treatment.user.firstname ~ " " ~ treatment.user.name }} pour le relancer sur le traitement du ticket.</h3>
+                            <label class="label">Entrez une raison<textarea required class="textarea" name="relanceReason"></textarea></label>
+                            <label><input hidden name="_csrf_token" value="{{ csrf_token('relance-treatment'~treatment.id) }}"></label>
+                            {% if treatment.endDate != null %}
+                                <label class="label">Ré-ouvrir le ticket
+                                    <input type="checkbox" checked="checked" class="checkbox" name="reopen">
+                                </label>
+                            {% endif %}
+                            <label class="label">Ajouter l'email dans la liste des destinataires
+                                <input class="input input-bordered" type="email" placeholder="service@plateforme-ticketing.fr" name="email">
+                            </label>
+                            <div class="modal-action">
+                                <a class="btn btn-info" href="{{ path('app_historic_by_service_see_ticket',{'service':service.id,'id':treatment.ticket.id}) }}">Retour</a>
+                                <button class="btn btn-primary" type="submit">Envoyer</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

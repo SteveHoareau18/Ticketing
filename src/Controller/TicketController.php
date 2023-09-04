@@ -12,6 +12,7 @@ use App\Form\TreatmentType;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TicketController extends AbstractController
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/new', name: 'app_ticket_new')]
     public function new(Request $request, EntityManagerInterface $registry): Response
@@ -34,6 +35,7 @@ class TicketController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $ticket->setCreator($user);
+            $ticket->setTransfered(false);
             $service = $registry->getRepository(Service::class)->find($form->get('service')->getData());
             if($service == null){
                 $this->addFlash('fail',"Ce service n'existe pas...");
@@ -71,7 +73,7 @@ class TicketController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/open/{id}', name: 'app_ticket_open')]
     public function open(Request $request, EntityManagerInterface $registry, $id): Response
@@ -82,10 +84,10 @@ class TicketController extends AbstractController
         $ticket = $registry->getRepository(Ticket::class)->find($id);
         if($ticket == null) return $this->redirectToRoute("app_main");
         if($ticket->getCreator()->getId() == $user->getId() || $ticket->getService()->getId() == $user->getService()->getId()) {
-            $treatment = $registry->getRepository(Treatment::class)->findOneBy(['caterer'=>$user]);
-            if($treatment != null && $treatment->getStatus() == "EN COURS") {
-                $this->addFlash('fail','Vous avez déjà ouvert un traitement...');
-            }else{
+            $treatment = $registry->getRepository(Treatment::class)->findOneBy(['caterer' => $user]);
+            if ($treatment != null && $treatment->getStatus() == "EN COURS") {
+                $this->addFlash('fail', 'Vous avez déjà ouvert un traitement...');
+            } else {
                 $treatment = new Treatment();
                 $form = $this->createForm(TreatmentType::class, $treatment);
                 $form->handleRequest($request);
@@ -105,12 +107,11 @@ class TicketController extends AbstractController
                     'form' => $form
                 ]);
             }
-        }else{
-            return $this->redirectToRoute("app_main");
         }
+        return $this->redirectToRoute("app_main");
     }
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/open/{id}/relayed/{treatment}', name: 'app_ticket_relayed')]
     public function relayed(Request $request, EntityManagerInterface $registry, $id, $treatment): Response
@@ -135,7 +136,7 @@ class TicketController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/close/{id}', name: 'app_ticket_close')]
     public function close(Request $request, EntityManagerInterface $registry, $id): Response
@@ -162,7 +163,7 @@ class TicketController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/transfer/{id}/for/{service}', name: 'app_ticket_transfer')]
     public function transfer(Request $request, EntityManagerInterface $registry, $id, $service): Response
