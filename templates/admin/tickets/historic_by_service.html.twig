@@ -3,15 +3,15 @@
 {% block title %}Ticketing | Historique des tickets du service {{ service.name }}{% endblock %}
 
 {% block body %}
-<div class="text-center">
-    <a class="btn btn-info" href="{{ path('app_main') }}">Retour</a>
-    <h1 class="font-extrabold m-3">Historique</h1>
-    <h2 class="badge badge-primary">SERVICE {{ service.name }}</h2>
-    <div class="grid grid-cols-3 mt-3 gap-4">
-        {% for ticket in service.ticket %}
-            <div class="card bg-gray-200 shadow-xl">
-                <div class="card-body">
-                    <h2 class="card-title">
+    <div class="text-center">
+        <a class="btn btn-info" href="{{ path('app_main') }}">Retour</a>
+        <h1 class="font-extrabold m-3">Historique</h1>
+        <h2 class="badge badge-primary">SERVICE {{ service.name }}</h2>
+        <div class="grid grid-cols-3 mt-3 gap-4">
+            {% for ticket in service.ticket %}
+                <div class="card bg-gray-200 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title">
                         <span class="badge badge-warning">
                             {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
                                 EN ATTENTE
@@ -19,27 +19,29 @@
                                 {{ ticket.treatments.last.status }}
                             {% endif %}
                         </span>
-                        <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
-                        <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
-                        <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
-                    <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
-                    <p>Traitement: {{ ticket.treatments|length }}</p>
-                    <div class="card-actions justify-end">
-                        <a class="btn btn-primary" href="{{ path('app_historic_by_service_see_ticket',{'service':service.id,'id': ticket.id }) }}">voir
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                            </svg>
-                        </a>
+                            <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                            <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
+                            <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                        <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                        <p>Traitement: {{ ticket.treatments|length }}</p>
+                        <div class="card-actions justify-end">
+                            <a class="btn btn-primary"
+                               href="{{ path('app_historic_by_service_see_ticket',{'service':service.id,'id': ticket.id }) }}">voir
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <a class="btn btn-info col-span-1 w-1/2" href="{{ path('app_main') }}">Retour</a>
-            <div class="col-span-1">
-                Aucun historique de tickets...
-            </div>
-        {% endfor %}
+            {% else %}
+                <a class="btn btn-info col-span-1 w-1/2" href="{{ path('app_main') }}">Retour</a>
+                <div class="col-span-1">
+                    Aucun historique de tickets...
+                </div>
+            {% endfor %}
+        </div>
     </div>
-</div>
 {% endblock %}

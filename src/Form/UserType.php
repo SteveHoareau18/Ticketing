@@ -15,46 +15,45 @@ class UserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                "label"=>"Identifiant",
-                'label_attr'=>['class'=>'label'],
-                'attr'=>['class'=>'input input-bordered','placeholder'=>'jdoe'],
-                "mapped"=>true,
-                "required"=>true,
-                "trim"=>true
+                "label" => "Identifiant",
+                'label_attr' => ['class' => 'label'],
+                'attr' => ['class' => 'input input-bordered', 'placeholder' => 'jdoe'],
+                "mapped" => true,
+                "required" => true,
+                "trim" => true
             ])
             ->add('email', EmailType::class, [
-                "label"=>"E-Mail",
-                'label_attr'=>['class'=>'label'],
-                'attr'=>['class'=>'input input-bordered','placeholder'=>'jdoe@gmail.com'],
-                "mapped"=>true,
-                "required"=>true,
-                "trim"=>true
+                "label" => "E-Mail",
+                'label_attr' => ['class' => 'label'],
+                'attr' => ['class' => 'input input-bordered', 'placeholder' => 'jdoe@gmail.com'],
+                "mapped" => true,
+                "required" => true,
+                "trim" => true
             ])
             ->add('name', TextType::class, [
-                "label"=>"Nom",
-                'label_attr'=>['class'=>'label'],
-                'attr'=>['class'=>'input input-bordered','placeholder'=>'Doe'],
-                "mapped"=>true,
-                "required"=>true,
-                "trim"=>true
+                "label" => "Nom",
+                'label_attr' => ['class' => 'label'],
+                'attr' => ['class' => 'input input-bordered', 'placeholder' => 'Doe'],
+                "mapped" => true,
+                "required" => true,
+                "trim" => true
             ])
             ->add('firstname', TextType::class, [
-                "label"=>"Prénom",
-                'label_attr'=>['class'=>'label'],
-                'attr'=>['class'=>'input input-bordered','placeholder'=>'John'],
-                "mapped"=>true,
-                "required"=>true,
-                "trim"=>true
+                "label" => "Prénom",
+                'label_attr' => ['class' => 'label'],
+                'attr' => ['class' => 'input input-bordered', 'placeholder' => 'John'],
+                "mapped" => true,
+                "required" => true,
+                "trim" => true
             ])
             ->add('service', TextType::class, [
-                "label"=>"Service",
-                'label_attr'=>['class'=>'label'],
-                'attr'=>['class'=>'input input-bordered','placeholder'=>'Rechercher...','list'=>'serviceLst'],
-                "mapped"=>false,
-                "required"=>true,
-                "trim"=>true
-            ])
-        ;
+                "label" => "Service",
+                'label_attr' => ['class' => 'label'],
+                'attr' => ['class' => 'input input-bordered', 'placeholder' => 'Rechercher...', 'list' => 'serviceLst'],
+                "mapped" => false,
+                "required" => true,
+                "trim" => true
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

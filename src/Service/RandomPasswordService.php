@@ -3,11 +3,13 @@
 namespace App\Service;
 
 
-class RandomPasswordService{
+class RandomPasswordService
+{
 
     private string $randomStrengthPassword;
 
-    public function __construct(){
+    public function __construct()
+    {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
 
         $this->randomStrengthPassword = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2);
@@ -23,7 +25,7 @@ class RandomPasswordService{
     /**
      * @return mixed
      */
-    public function getRandomStrenghPassword():string
+    public function getRandomStrenghPassword(): string
     {
         return $this->randomStrengthPassword;
     }

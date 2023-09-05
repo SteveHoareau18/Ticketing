@@ -23,10 +23,10 @@ class MailController extends AbstractController
     public function configurationMail(MailConfigurationRepository $repository): Response
     {
         $mailConfigs = $repository->findAll();
-        if(sizeof($mailConfigs)==0){
+        if (sizeof($mailConfigs) == 0) {
             return $this->redirectToRoute("app_configuration_mail_new");
-        }else{
-            return $this->redirectToRoute("app_configuration_mail_edit", ['id'=>$mailConfigs[0]->getId()]);
+        } else {
+            return $this->redirectToRoute("app_configuration_mail_edit", ['id' => $mailConfigs[0]->getId()]);
         }
     }
 
@@ -51,7 +51,7 @@ class MailController extends AbstractController
 
         return $this->render('admin/settings/email.html.twig', [
             'emailConfig' => $form,
-            'alreadyExist'=>false
+            'alreadyExist' => false
         ]);
     }
 
@@ -74,7 +74,7 @@ class MailController extends AbstractController
 
         return $this->render('admin/settings/email.html.twig', [
             'emailConfig' => $form,
-            'alreadyExist'=>true
+            'alreadyExist' => true
         ]);
     }
 

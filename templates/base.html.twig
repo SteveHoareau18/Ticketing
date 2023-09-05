@@ -1,64 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr-FR" data-theme="mytheme">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Ticketing{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Ticketing{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body class="h-full w-full max-h-full max-w-full">
-        <div class="navbar bg-accent mb-3">
-            <div class="flex-1">
-                <a class="btn btn-ghost normal-case text-xl" href="{{ path('app_main') }}">Plateforme Ticketing{% if app.user and "ROLE_ADMIN" in app.user.roles %} (admin){% endif %}</a>
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body class="h-full w-full max-h-full max-w-full">
+<div class="navbar bg-accent mb-3">
+    <div class="flex-1">
+        <a class="btn btn-ghost normal-case text-xl" href="{{ path('app_main') }}">Plateforme
+            Ticketing{% if app.user and "ROLE_ADMIN" in app.user.roles %} (admin){% endif %}</a>
+    </div>
+    {% if app.user %}
+        <div class="flex-none gap-2">
+            <div>
+                {{ app.user.userIdentifier }}
             </div>
-            {% if app.user %}
-                <div class="flex-none gap-2">
-                    <div>
-                        {{ app.user.userIdentifier }}
-                    </div>
-                    <div class="dropdown dropdown-end">
-                        <div tabindex="0" class="btn btn-ghost btn-circle avatar">
-                            <div class="w-10 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path>
-                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                            <li><a href="{{ path('app_settings') }}">Paramètre</a></li>
-                            <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
-                        </ul>
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person-circle"
+                             viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path>
+                            <path fill-rule="evenodd"
+                                  d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path>
+                        </svg>
                     </div>
                 </div>
-            {% endif %}
+                <ul tabindex="0"
+                    class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                    <li><a href="{{ path('app_settings') }}">Paramètre</a></li>
+                    <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                </ul>
+            </div>
         </div>
-        {% set id = 0 %}
-        {% for message in app.session.flashBag.get('fail') %}
-            <div class="alert alert-error mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{{ message }}</span>
-            </div>
-            {% set id = id+1 %}
-        {% endfor %}
-        {% set id = 0 %}
-        {% for message in app.session.flashBag.get('success') %}
-            <div class="alert alert-success mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{{ message }}</span>
-            </div>
-            {% set id =id+1 %}
-        {% endfor %}
-        {% block body %}{% endblock %}
-    </body>
+    {% endif %}
+</div>
+{% set id = 0 %}
+{% for message in app.session.flashBag.get('fail') %}
+    <div class="alert alert-error mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>{{ message }}</span>
+    </div>
+    {% set id = id+1 %}
+{% endfor %}
+{% set id = 0 %}
+{% for message in app.session.flashBag.get('success') %}
+    <div class="alert alert-success mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>{{ message }}</span>
+    </div>
+    {% set id =id+1 %}
+{% endfor %}
+{% block body %}{% endblock %}
+</body>
 </html>

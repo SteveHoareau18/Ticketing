@@ -21,9 +21,12 @@
                         <table>
                             <tr>
                                 <td>
-                                    <a href="{{ path('app_user_edit',{'username':user.username}) }}" class="btn btn-warning">
-                                        Modifier les informations<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"></path>
+                                    <a href="{{ path('app_user_edit',{'username':user.username}) }}"
+                                       class="btn btn-warning">
+                                        Modifier les informations
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"></path>
                                         </svg>
                                     </a>
                                 </td>
@@ -47,13 +50,13 @@
                 <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
                     <span id="openBadgeIdService{{ user.id }}" class="badge badge-error">-</span>
                     <span id="createBadgeIdService{{ user.id }}" class="badge badge-info">-</span>
-                    <span  id="closeBadgeIdService{{ user.id }}" class="badge badge-success">-</span>
+                    <span id="closeBadgeIdService{{ user.id }}" class="badge badge-success">-</span>
                 </div>
             </a>
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded",()=>{
+        document.addEventListener("DOMContentLoaded", () => {
             let ctx;
             let chart;
             let ms = [];
@@ -63,21 +66,21 @@
             $.ajax({
                 type: 'POST',
                 url: '/api/count-tickets-user/{{ user.id }}/',
-                data: {_csrf_token: "{{ csrf_token('api-count-user'~user.id) }}" },
-                success: function(response) {
-                    if(response!==500) {
-                        ms["{{user.id}}"].data.datasets[0].data[0] = parseFloat(response[0]);
-                        ms["{{user.id}}"].data.datasets[0].data[1] = parseFloat(response[1]);
-                        ms["{{user.id}}"].data.datasets[0].data[2] = parseFloat(response[2]);
-                        ms["{{user.id}}"].update();
-                        $('#openBadgeIdService{{ user.id }}').html("Ticket OUVERT: "+response[0]);
-                        $('#createBadgeIdService{{ user.id }}').html("Ticket CREE: "+response[1]);
-                        $('#closeBadgeIdService{{ user.id }}').html("Ticket FERMÉ: "+response[2]);
-                    }else{
+                data: {_csrf_token: "{{ csrf_token('api-count-user'~user.id) }}"},
+                success: function (response) {
+                    if (response !== 500) {
+                        ms["{{ user.id }}"].data.datasets[0].data[0] = parseFloat(response[0]);
+                        ms["{{ user.id }}"].data.datasets[0].data[1] = parseFloat(response[1]);
+                        ms["{{ user.id }}"].data.datasets[0].data[2] = parseFloat(response[2]);
+                        ms["{{ user.id }}"].update();
+                        $('#openBadgeIdService{{ user.id }}').html("Ticket OUVERT: " + response[0]);
+                        $('#createBadgeIdService{{ user.id }}').html("Ticket CREE: " + response[1]);
+                        $('#closeBadgeIdService{{ user.id }}').html("Ticket FERMÉ: " + response[2]);
+                    } else {
                         console.error('Erreur lors de la requête. (500)');
                     }
                 },
-                error: function() {
+                error: function () {
                     console.error('Erreur lors de la requête.');
                 }
             });
@@ -85,11 +88,10 @@
             chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: [
-                    ],
+                    labels: [],
                     datasets: [{
                         label: '',
-                        data: [1,1,1],
+                        data: [1, 1, 1],
                         backgroundColor: [
                             'rgb(255, 99, 132)',
                             'rgb(54, 162, 235)',
