@@ -15,9 +15,15 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ *
+ */
 #[Route('/mon-compte')]
 class SettingsController extends AbstractController
 {
+    /**
+     * @return Response
+     */
     #[Route('/', name: 'app_settings')]
     public function settings(): Response
     {
@@ -25,6 +31,13 @@ class SettingsController extends AbstractController
         return $this->render('settings.html.twig', []);
     }
 
+    /**
+     * @param Request $request
+     * @param UserPasswordHasherInterface $hasher
+     * @param EntityManagerInterface $manager
+     * @return Response
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     #[Route('/changer-de-mot-passe', name: 'app_settings_reset_password', methods: ['POST'])]
     public function resetPassword(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $manager): Response
     {

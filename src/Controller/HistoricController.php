@@ -9,6 +9,7 @@ use App\Entity\Ticket;
 use App\Entity\Treatment;
 use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +19,18 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ *
+ */
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/historic')]
 class HistoricController extends AbstractController
 {
+    /**
+     * @param EntityManagerInterface $registry
+     * @param $service
+     * @return Response
+     */
     #[Route('/by-service/{service}', name: 'app_historic_by_service')]
     public function historicByService(EntityManagerInterface $registry, $service): Response
     {
@@ -34,6 +43,12 @@ class HistoricController extends AbstractController
         ]);
     }
 
+    /**
+     * @param EntityManagerInterface $registry
+     * @param $service
+     * @param $id
+     * @return Response
+     */
     #[Route('/by-service/{service}/see/{id}', name: 'app_historic_by_service_see_ticket')]
     public function historicByServiceSeeTicket(EntityManagerInterface $registry, $service, $id): Response
     {
@@ -50,7 +65,7 @@ class HistoricController extends AbstractController
 
     /**
      * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route('/by-service/{service}/relance/{id}/treatment/{treatment}', name: 'app_historic_by_service_relance_treatment_for_ticket')]
     public function historicRelanceTreatmentForTicket(Request $request, EntityManagerInterface $registry, $service, $id, $treatment): Response

@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ *
+ */
 #[Route('/ticket')]
 class TicketController extends AbstractController
 {
@@ -53,6 +56,11 @@ class TicketController extends AbstractController
         ]);
     }
 
+    /**
+     * @param EntityManagerInterface $registry
+     * @param $id
+     * @return Response
+     */
     #[Route('/see/{id}', name: 'app_ticket_see')]
     public function see(EntityManagerInterface $registry, $id): Response
     {

@@ -10,21 +10,27 @@ use App\Repository\UserRepository;
 use App\Service\MailService;
 use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Exception\NotSupported;
-use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ *
+ */
 #[IsGranted("ROLE_ADMIN")]
 #[Route('/admin/gestion/utilisateur')]
 class UserController extends AbstractController
 {
+    /**
+     * @param UserRepository $repository
+     * @return Response
+     */
     #[Route('/', name: 'app_user')]
     public function index(UserRepository $repository): Response
     {
@@ -39,8 +45,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws NotSupported
-     * @throws ORMException
+     * @throws TransportExceptionInterface
      */
     #[Route('/new', name: 'app_user_new')]
     public function new(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
@@ -95,6 +100,11 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @param EntityManagerInterface $manager
+     * @param $username
+     * @return Response
+     */
     #[Route('/see/{username}', name: 'app_user_see')]
     public function see(EntityManagerInterface $manager, $username): Response
     {
@@ -107,6 +117,12 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param $username
+     * @return Response
+     */
     #[Route('/edit/{username}', name: 'app_user_edit')]
     public function edit(Request $request, EntityManagerInterface $manager, $username): Response
     {
@@ -138,6 +154,12 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param $username
+     * @return Response
+     */
     #[Route('/delete/{username}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, EntityManagerInterface $manager, $username): Response
     {
