@@ -47,10 +47,12 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     }
 
     /**
+     * Fonction dans l'interface qui est appelée lorsque l'utilisateur s'est bien authentifié
      * @param Request $request
      * @param TokenInterface $token
      * @param string $firewallName
      * @return Response|null
+     * @see AuthenticatorInterface
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {

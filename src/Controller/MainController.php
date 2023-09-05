@@ -27,15 +27,15 @@ class MainController extends AbstractController
 {
 
     /**
+     * Route principale -> Vérifie si on est connecté et redirige l'utilisateur vers la vue
      * @param Request $request
      * @param ManagerRegistry $managerRegistry
      * @return Response
-     * Route principale -> Vérifie si on est connecté et redirige l'utilisateur vers la vue
      */
     #[Route('/', name: 'app_main')]
     public function index(Request $request, ManagerRegistry $managerRegistry): Response
     {
-        if (!$this->getUser()) return $this->redirectToRoute("app_login");
+        if (!$this->getUser()) return $this->redirectToRoute("app_login"); //Redirige l'utilisateur vers la page de connexion s'il n'est pas connecté
         $serviceLst = $managerRegistry->getRepository(Service::class)->findAll();//Sert pour le mode admin
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';//Système de filtre pour les tickets
         $dashboard = false;
@@ -49,7 +49,7 @@ class MainController extends AbstractController
             'serviceLst' => $serviceLst,
             'status' => $status,
             'dashboard' => $dashboard
-        ]);
+        ]);//On retourne la vue a afficher
     }
 
     /**
