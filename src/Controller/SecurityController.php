@@ -2,18 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\MailConfiguration;
 use App\Entity\Service;
 use App\Entity\User;
+use App\Service\MailService;
+use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\String\ByteString;
 
 class SecurityController extends AbstractController
 {
@@ -40,32 +43,34 @@ class SecurityController extends AbstractController
                  $user->setName("HOAREAU");
                  $user->setUsername("hsteve");
                  $user->setService($serviceRepository->findAll()[0]);
-                 $password =  ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
-                 $password .= ByteString::fromRandom(4, '0123456789')->toString();
+                 $password = (new RandomPasswordService())->getRandomStrenghPassword();
                  $user->setPassword($hasher->hashPassword($user, $password));
+                 $mailConfiguration = $registry->getRepository(MailConfiguration::class)->findAll()[0];
+                 if($mailConfiguration != null) {
+                     $mailService = new MailService($mailConfiguration);
+                     $email = (new Email())
+                         ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
+                         ->to($user->getEmail())
+                         ->subject('Creation de votre compte // PLATEFORME TICKETING')
+                         ->html("<p>Bonjour, votre compte a été crée avec l'identifiant " . $user->getUsername() . " et le mot de passe: " . $password . '</p><p>Celui-ci doit rester confidentiel !</p>');
 
-//                 try {
-//                     $email = (new Email())
-//                         ->from('ac63f97c3f-aa64d3@inbox.mailtrap.io')
-//                         ->to($user->getEmail())
-//                         ->subject('Votre mot de passe de la plateforme ticketing')
-//                         ->html('<p>Votre mot de passe est <strong>' . $password . '</strong></p><p>Attention ! Il doit rester confidentiel.</p>');
-//                     $mailer->send($email);
-//                     dd($mailer);
-//                 }catch (\Exception $e){
-//                     dd($e);
-//                 }//TODO mailer
+                     foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
+                         $email->addCc(new Address(trim($address)));
+                     }
 
-                 $this->addFlash('success',$password);
+                     $mailService->getMailer()->send($email);
 
-                 $registry->persist($user);
-                 $registry->flush();
+                     $this->addFlash('success', 'La génération de compte a été effectuée. Contactez steve.hoareau1@gmail.com.');
+
+                     $registry->persist($user);
+                     $registry->flush();
+                 }else{
+                     $this->addFlash('fail', "Une erreur est survenue, la génération de compte n'a pas été effectuée. Contactez steve.hoareau1@gmail.com.");
+                 }
              }
          }
 
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);

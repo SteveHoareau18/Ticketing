@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\MailConfiguration;
 use App\Entity\User;
 use App\Service\MailService;
+use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +31,7 @@ class SettingsController extends AbstractController
     {
         if(!$this->getUser()) return $this->redirectToRoute("app_login");
         if($request->request->has('_csrf_token') && $this->isCsrfTokenValid('random-password'.$this->getUser()->getUserIdentifier(),$request->request->get('_csrf_token'))) {
-            $password = ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
-            $password .= ByteString::fromRandom(4, '0123456789')->toString();
+            $password = (new RandomPasswordService())->getRandomStrenghPassword();
             $user = $manager->getRepository(User::class)->findOneBy(['username'=>$this->getUser()->getUserIdentifier()]);
             $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
             if($mailConfiguration != null) {

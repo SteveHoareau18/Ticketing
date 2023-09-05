@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Service\MailService;
+use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
@@ -59,8 +60,7 @@ class UserController extends AbstractController
                     $user->setRoles(array("ROLE_USER"));
                     $user->setService($service);
                     $user->setActive(false);
-                    $password =  ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
-                    $password .= ByteString::fromRandom(4, '0123456789')->toString();
+                    $password = (new RandomPasswordService())->getRandomStrenghPassword();
                     $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
                     if($mailConfiguration != null) {
                         $user->setPassword($hasher->hashPassword($user, $password));
@@ -74,7 +74,7 @@ class UserController extends AbstractController
                             ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
                             ->to($user->getEmail())
                             ->subject('Creation de votre compte // PLATEFORME TICKETING')
-                            ->html("<p>Bonjour, votre compte a été crée avec l'identifiant ".$user->getUsername()." et le mot de passe ".$password.'</p><p>Celui-ci doit rester confidentiel !</p>');
+                            ->html("<p>Bonjour, votre compte a été crée avec l'identifiant ".$user->getUsername()." et le mot de passe: ".$password.'</p><p>Celui-ci doit rester confidentiel !</p>');
 
                         foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
                             $email->addCc(new Address(trim($address)));

@@ -8,6 +8,7 @@ use App\Entity\Ticket;
 use App\Entity\Treatment;
 use App\Entity\User;
 use App\Service\MailService;
+use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -83,8 +84,7 @@ class MainController extends AbstractController
         if($request->request->has('inputEmail') && $request->request->has('_csrf_token') && $this->isCsrfTokenValid('lost-password',$request->request->get('_csrf_token'))){
             $user = $manager->getRepository(User::class)->findOneBy(['email'=>$request->request->get('inputEmail')]);
             if($user != null){
-                $password =  ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
-                $password .= ByteString::fromRandom(4, '0123456789')->toString();
+                $password = (new RandomPasswordService())->getRandomStrenghPassword();
                 $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
                 if($mailConfiguration != null) {
                     $user->setPassword($hasher->hashPassword($user, $password));
@@ -97,7 +97,7 @@ class MainController extends AbstractController
                         ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
                         ->to($user->getEmail())
                         ->subject('Un parametre a ete change dans votre compte // PLATEFORME TICKETING')
-                        ->html("<p>Bonjour, votre mot de passe a été réinitialisé avec l'identifiant ".$user->getUsername()." et le mot de passe ".$password.'</p><p>Celui-ci doit rester confidentiel !</p>');
+                        ->html("<p>Bonjour, votre mot de passe a été réinitialisé avec l'identifiant ".$user->getUsername()." et le mot de passe: ".$password.'</p><p>Celui-ci doit rester confidentiel !</p>');
 
                     foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
                         $email->addCc(new Address(trim($address)));
