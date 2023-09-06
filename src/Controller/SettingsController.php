@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\MailConfiguration;
 use App\Entity\User;
 use App\Service\MailService;
+use App\Service\RandomPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,30 +14,41 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\ByteString;
 
+/**
+ *
+ */
 #[Route('/mon-compte')]
 class SettingsController extends AbstractController
 {
+    /**
+     * @return Response
+     */
     #[Route('/', name: 'app_settings')]
     public function settings(): Response
     {
-        if(!$this->getUser()) return $this->redirectToRoute("app_login");
+        if (!$this->getUser()) return $this->redirectToRoute("app_login");
         return $this->render('settings.html.twig', []);
     }
 
+    /**
+     * @param Request $request
+     * @param UserPasswordHasherInterface $hasher
+     * @param EntityManagerInterface $manager
+     * @return Response
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     #[Route('/changer-de-mot-passe', name: 'app_settings_reset_password', methods: ['POST'])]
     public function resetPassword(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $manager): Response
     {
-        if(!$this->getUser()) return $this->redirectToRoute("app_login");
-        if($request->request->has('_csrf_token') && $this->isCsrfTokenValid('random-password'.$this->getUser()->getUserIdentifier(),$request->request->get('_csrf_token'))) {
-            $password = ByteString::fromRandom(8, implode('', range('A', 'Z')))->toString(); // uppercase letters only (e.g: sponsor code)
-            $password .= ByteString::fromRandom(4, '0123456789')->toString();
-            $user = $manager->getRepository(User::class)->findOneBy(['username'=>$this->getUser()->getUserIdentifier()]);
+        if (!$this->getUser()) return $this->redirectToRoute("app_login");
+        if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('random-password' . $this->getUser()->getUserIdentifier(), $request->request->get('_csrf_token'))) {
+            $password = (new RandomPasswordService())->getRandomStrenghPassword();
+            $user = $manager->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
             $mailConfiguration = $manager->getRepository(MailConfiguration::class)->findAll()[0];
-            if($mailConfiguration != null) {
+            if ($mailConfiguration != null) {
                 $user->setPassword($hasher->hashPassword($user, $password));
-                if(!$user->isActive())$user->setActive(true);
+                if (!$user->isActive()) $user->setActive(true);
                 $manager->persist($user);
                 $manager->flush();
 
@@ -45,7 +57,7 @@ class SettingsController extends AbstractController
                     ->from(new Address($mailConfiguration->getLogin(), $mailConfiguration->getSubject()))
                     ->to($user->getEmail())
                     ->subject('Un parametre a ete change dans votre compte // PLATEFORME TICKETING')
-                    ->html('<p>Bonjour, voici votre nouveau mot de passe: '.$password.'</p><strong>Celui-ci doit rester confidentiel !</strong>');
+                    ->html('<p>Bonjour, voici votre nouveau mot de passe: ' . $password . '</p><strong>Celui-ci doit rester confidentiel !</strong>');
 
                 foreach (explode(',', $mailConfiguration->getCcAddress()) as $address) {
                     $email->addCc(new Address(trim($address)));
@@ -53,10 +65,10 @@ class SettingsController extends AbstractController
 
                 $mailService->getMailer()->send($email);
                 $this->addFlash('success', 'Votre nouveau mot de passe vous a été en envoyé par mail');
-            }else {
+            } else {
                 $this->addFlash("fail", "Une erreur est intervenue...");
             }
-        }else{
+        } else {
             $this->addFlash("fail", "Une erreur est intervenue...");
         }
         return $this->redirectToRoute("app_settings");

@@ -1,3 +1,4 @@
+{# Vue principale #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Ticketing{% endblock %}
@@ -5,7 +6,8 @@
 {% block body %}
     {% if not app.user.active %}
         <div class="badge bg-warning text-lime-50 w-full h-10 p-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                 class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
                 <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"></path>
                 <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"></path>
             </svg>
@@ -15,112 +17,224 @@
         </div>
     {% endif %}
     {% if "ROLE_ADMIN" in app.user.roles %}
-        <div class="grid grid-cols-3 gap-4">
-            {% for service in serviceLst %}
-                <div class="bg-gray-300 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="badge badge-secondary">{{ service.name }}</span>
+        {#        Mode admin #}
+        {% if dashboard == true %}
+            {#            Affichage du dashboard #}
+            <h1 class="text-center font-extrabold m-3">Tableau de bord administratif</h1>
+            <div class="grid grid-cols-3 gap-4">
+                {% for service in serviceLst %}{# on parcours la liste des service donné en paramètre lors du rendu de la vue depuis le controller #}
+                    <div class="bg-gray-300 rounded-lg p-4">
+                        <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">{# Possibilité de cliquer pour avoir + d'information #}
+                            <div class="text-center">
+                                <span class="badge badge-secondary">{{ service.name }}</span>
+                            </div>
+                            <div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-left: 20%">
+                                <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
+                            </div>
+                            <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
+                                <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
+                            </div>
+                        </a>
                     </div>
-                    <div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-left: 20%">
-                        <canvas id="canvaService{{ service.id }}"></canvas>
+                {% endfor %}
+            </div>
+        {% else %}
+            {# duplicata du mode user //TODO à paufiner pour pas faire de doublon de code #}
+            <div>
+                <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
+                <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
+                <a class="btn btn-ghost" href="{{ path('app_main_my_tickets') }}">VOIR LES TICKETS QUE J'AI CREER</a>
+                <div class="text-center">
+                    <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
+                    <div>
+                        {% if status == "EN ATTENTE" %}
+                            <a class="btn btn-success" href="{{ path('app_main') }}?dashboard=false">EN ATTENTE</a>
+                        {% else %}
+                            <a class="btn btn-ghost" href="{{ path('app_main') }}?dashboard=false">EN ATTENTE</a>
+                        {% endif %}
+                        {% if status == "EN COURS" %}
+                            <a class="btn btn-success" href="{{ path('app_main') }}?status=EN_COURS&dashboard=false">EN
+                                COURS</a>
+                        {% else %}
+                            <a class="btn btn-ghost" href="{{ path('app_main') }}?status=EN_COURS&dashboard=false">EN
+                                COURS</a>
+                        {% endif %}
+                        {% if status == "Fermé" %}
+                            <a class="btn btn-success"
+                               href="{{ path('app_main') }}?status=Fermé&dashboard=false">FERMÉ</a>
+                        {% else %}
+                            <a class="btn btn-ghost"
+                               href="{{ path('app_main') }}?status=Fermé&dashboard=false">FERMÉ</a>
+                        {% endif %}
                     </div>
-                    <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
-                        <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>
-                        <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>
-                        <span  id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>
+                    <div class="grid grid-cols-3 mt-3 gap-4">
+                        {% set ticket_in_cat = false %}
+                        {% for ticket in app.user.service.ticket %}
+                            {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
+                                {% set ticket_in_cat = true %}
+                                <div class="card bg-gray-200 shadow-xl">
+                                    <div class="card-body">
+                                        <h2 class="card-title">
+                                        <span class="badge badge-warning">
+                                            {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
+                                                EN ATTENTE
+                                            {% else %}
+                                                {{ ticket.treatments.last.status }}
+                                            {% endif %}</span>
+                                            <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                                            <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
+                                            <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                                        <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                                        <p>Traitement: {{ ticket.treatments|length }}</p>
+                                        <div class="card-actions justify-end">
+                                            <a class="btn btn-primary"
+                                               href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                     fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not ticket_in_cat %}
+                            Il n'y a pas de ticket dans cette catégorie...
+                        {% endif %}
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endif %}
         <div class="mt-3 ml-2 mb-3 grid grid-cols-3 gap-4">
+            {% if dashboard %}
+                <a href="{{ path('app_main') }}?dashboard=false" class="btn btn-success w-full">VOIR LES TICKETS DE MON
+                    SERVICE</a>
+            {% else %}
+                <a href="{{ path('app_main') }}" class="btn btn-success w-full">VOIR LE DASHBOARD</a>
+            {% endif %}
             <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
+            <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary w-full">PARAMETRE MAIL</a>
         </div>
-    {% else %}
+    {% else %}{# L'utilisateur n'est pas ADMIN -> Mode user #}
         <div>
-            <a class="btn btn-secondary" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
+            <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
             <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
-            <a class="btn btn-ghost" href="{{ path('app_ticket_new') }}">VOIR LES TICKETS QUE J'AI CREER</a>
+            <a class="btn btn-ghost" href="{{ path('app_main_my_tickets') }}">VOIR LES TICKETS QUE J'AI CREER</a>
             <div class="text-center">
                 <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
+                <div>
+                    {% if status == "EN ATTENTE" %}
+                        <a class="btn btn-success" href="{{ path('app_main') }}">EN ATTENTE</a>
+                    {% else %}
+                        <a class="btn btn-ghost" href="{{ path('app_main') }}">EN ATTENTE</a>
+                    {% endif %}
+                    {% if status == "EN COURS" %}
+                        <a class="btn btn-success" href="{{ path('app_main') }}?status=EN_COURS">EN COURS</a>
+                    {% else %}
+                        <a class="btn btn-ghost" href="{{ path('app_main') }}?status=EN_COURS">EN COURS</a>
+                    {% endif %}
+                    {% if status == "Fermé" %}
+                        <a class="btn btn-success" href="{{ path('app_main') }}?status=Fermé">FERMÉ</a>
+                    {% else %}
+                        <a class="btn btn-ghost" href="{{ path('app_main') }}?status=Fermé">FERMÉ</a>
+                    {% endif %}
+                </div>
                 <div class="grid grid-cols-3 mt-3 gap-4">
+                    {% set ticket_in_cat = false %}{# variable qui va servir à afficher ou pas le message de filtrage (instruction en bas) #}
                     {% for ticket in app.user.service.ticket %}
-                        <div class="card bg-gray-200 shadow-xl">
-                            <div class="card-body">
-                                <h2 class="card-title">
-                                    <span class="badge badge-warning">
-                                        {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
-                                            EN ATTENTE
-                                        {% else %}
-                                            {{ ticket.treatments.last.status }}
-                                        {% endif %}</span>
-                                    <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
-                                    <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
-                                    <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
-                                <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
-                                <p>Traitement: {{ ticket.treatments|length }}</p>
-                                <div class="card-actions justify-end">
-                                    <a class="btn btn-primary" href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
-                                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                                        </svg>
-                                    </a>
+                        {# status est la catégorie qui filtre par status et qui est defini en requete GET  #}
+                        {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
+                            {% set ticket_in_cat = true %}
+                            <div class="card bg-gray-200 shadow-xl">
+                                <div class="card-body">
+                                    <h2 class="card-title">
+                                        <span class="badge badge-warning">
+                                            {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
+                                                EN ATTENTE
+                                            {% else %}
+                                                {{ ticket.treatments.last.status }}
+                                            {% endif %}</span>
+                                        <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                                        <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
+                                        <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                                    <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                                    <p>Traitement: {{ ticket.treatments|length }}</p>
+                                    <div class="card-actions justify-end">
+                                        <a class="btn btn-primary"
+                                           href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
+                    {% if not ticket_in_cat %}{# ... #}
+                        Il n'y a pas de ticket dans cette catégorie...
+                    {% endif %}
                 </div>
             </div>
         </div>
     {% endif %}
     <script>
-        document.addEventListener("DOMContentLoaded",()=>{
+        document.addEventListener("DOMContentLoaded", () => {
             let ctx;
             let chart;
             let ms = [];
-            {% for service in serviceLst %}
-                ctx = document.getElementById('canvaService{{ service.id }}');
+            {% for service in serviceLst %}/*On parcours la liste des services*/
+            ctx = document.getElementById('canvaService{{ service.id }}');
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/count-tickets/{{ service.id }}/',
-                    data: {_csrf_token: "{{ csrf_token('api-count'~service.id) }}" },
-                    success: function(response) {
-                        if(response!==500) {
-                            ms["{{service.id}}"].data.datasets[0].data[0] = parseFloat(response[0]);
-                            ms["{{service.id}}"].data.datasets[0].data[1] = parseFloat(response[1]);
-                            ms["{{service.id}}"].data.datasets[0].data[2] = parseFloat(response[2]);
-                            ms["{{service.id}}"].update();
-                            $('#waitingBadgeIdService{{ service.id }}').html("Ticket EN ATTENTE: "+response[0]);
-                            $('#inProgressBadgeIdService{{ service.id }}').html("Ticket EN COURS: "+response[1]);
-                            $('#closeBadgeIdService{{ service.id }}').html("Ticket FERMÉ: "+response[2]);
-                        }else{
-                            console.error('Erreur lors de la requête. (500)');
-                        }
-                    },
-                    error: function() {
-                        console.error('Erreur lors de la requête.');
+            //Création de la requête AJAX en POST
+            $.ajax({
+                type: 'POST',
+                url: '{{ path('app_api_count_tickets_service', {'service':service.id}) }}',
+                data: {_csrf_token: "{{ csrf_token('api-count'~service.id) }}"},
+                success: function (response) {//s'il n'y pas d'erreur
+                    if (response !== 500) {//la route peut retourner new JsonResponse(500)
+                        ms["{{ service.id }}"].data.datasets[0].data[0] = parseFloat(response[0]);//Set du data par rapport à la response dans le Chart
+                        ms["{{ service.id }}"].data.datasets[0].data[1] = parseFloat(response[1]);
+                        ms["{{ service.id }}"].data.datasets[0].data[2] = parseFloat(response[2]);
+                        //tableau de longueur 3 car il y a 3 types de tickets
+                        ms["{{ service.id }}"].update();
+                        console.log(response);
+                        $('#waitingBadgeIdService{{ service.id }}').html("Ticket EN ATTENTE: " + response[0]);//Mise a jour du badge qui affiche le nombre de tickets
+                        $('#inProgressBadgeIdService{{ service.id }}').html("Ticket EN COURS: " + response[1]);
+                        $('#closeBadgeIdService{{ service.id }}').html("Ticket FERMÉ: " + response[2]);
+                    } else {
+                        console.error('Erreur lors de la requête. (500)');
                     }
-                });
+                },
+                error: function (error) {//il peut avoir une erreur
+                    console.error('Erreur lors de la requête. '+error);
+                }
+            });
 
-                chart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: [
+            //Création d'un diagramme
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '',
+                        data: [1, 1, 1],//défaut 3 types de valeur 1, c'est le poids que ça prendra dans le diagramme
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(123,255,86)'
                         ],
-                        datasets: [{
-                            label: '',
-                            data: [1,1,1],
-                            backgroundColor: [
-                                'rgb(255, 99, 132)',
-                                'rgb(54, 162, 235)',
-                                'rgb(123,255,86)'
-                            ],
-                            hoverOffset: 2
-                        }],
-                    }
-                });
-                ms["{{ service.id }}"] = chart;
+                        hoverOffset: 2
+                    }],
+                }
+            });
+            ms["{{ service.id }}"] = chart;
             {% endfor %}
             console.log(ms);
         });

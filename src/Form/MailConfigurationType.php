@@ -24,7 +24,7 @@ class MailConfigurationType extends AbstractType
                 'constraints' => [
                     new NotBlank()
                 ],
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Nom de l\'expéditeur (sujet de chaque mail)'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Nom de l\'expéditeur (sujet de chaque mail)'],
                 'trim' => true,
                 'required' => false
             ])
@@ -33,7 +33,7 @@ class MailConfigurationType extends AbstractType
                 'constraints' => [
                     new NotBlank()
                 ],
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Adresse e-mail'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Adresse e-mail'],
                 'trim' => true,
                 'required' => false
             ])
@@ -42,26 +42,26 @@ class MailConfigurationType extends AbstractType
                 'constraints' => [
                     new NotBlank()
                 ],
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Mot de passe'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Mot de passe'],
                 'trim' => true,
                 'required' => false
             ])
             ->add('smtpAddress', TextType::class, [
                 'label' => 'Adresse du serveur SMTP',
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Adresse du serveur SMTP'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Adresse du serveur SMTP'],
                 'trim' => true,
                 'required' => false
             ])
             ->add('smtpPort', IntegerType::class, [
                 'label' => 'Port SMTP',
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Port SMTP'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Port SMTP'],
             ])
             ->add('smtpTls', CheckboxType::class, [
                 'label' => 'SMTP TLS actif',
                 'row_attr' => [
                     'class' => 'text-center p-5'
                 ],
-                'attr'=> ['class'=>'checkbox checkbox-xs'],
+                'attr' => ['class' => 'checkbox checkbox-xs'],
                 'required' => false
             ])
             ->add('ccAddress', TextType::class, [
@@ -69,13 +69,13 @@ class MailConfigurationType extends AbstractType
                 'constraints' => [
                     new NotBlank()
                 ],
-                'attr'=> ['class'=>'input input-bordered w-full max-w-xs', 'placeholder'=>'Adresse(s) de réception, (séparées par "," si multiples)'],
+                'attr' => ['class' => 'input input-bordered w-full max-w-xs', 'placeholder' => 'Adresse(s) de réception, (séparées par "," si multiples)'],
                 'trim' => true,
                 'required' => false
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Confirmer',
-                'attr'=> ['class'=>'btn btn-primary']
+                'attr' => ['class' => 'btn btn-primary']
             ]);
     }
 

@@ -11,25 +11,38 @@ use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ *
+ */
 #[IsGranted("ROLE_ADMIN")]
 #[Route('/admin/parametre')]
 class MailController extends AbstractController
 {
+    /**
+     * @param MailConfigurationRepository $repository
+     * @return Response
+     */
     #[Route('/mail', name: 'app_configuration_mail')]
     public function configurationMail(MailConfigurationRepository $repository): Response
     {
         $mailConfigs = $repository->findAll();
-        if(sizeof($mailConfigs)==0){
+        if (sizeof($mailConfigs) == 0) {
             return $this->redirectToRoute("app_configuration_mail_new");
-        }else{
-            return $this->redirectToRoute("app_configuration_mail_edit", ['id'=>$mailConfigs[0]->getId()]);
+        } else {
+            return $this->redirectToRoute("app_configuration_mail_edit", ['id' => $mailConfigs[0]->getId()]);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $repository
+     * @return Response
+     */
     #[Route('/mail/new', name: 'app_configuration_mail_new')]
     public function configurationMailNew(Request $request, EntityManagerInterface $repository): Response
     {
@@ -51,10 +64,15 @@ class MailController extends AbstractController
 
         return $this->render('admin/settings/email.html.twig', [
             'emailConfig' => $form,
-            'alreadyExist'=>false
+            'alreadyExist' => false
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $repository
+     * @return Response
+     */
     #[Route('/mail/edit', name: 'app_configuration_mail_edit')]
     public function configurationMailEdit(Request $request, EntityManagerInterface $repository): Response
     {
@@ -74,10 +92,16 @@ class MailController extends AbstractController
 
         return $this->render('admin/settings/email.html.twig', [
             'emailConfig' => $form,
-            'alreadyExist'=>true
+            'alreadyExist' => true
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param EntityManagerInterface $repository
+     * @return Response
+     * @throws TransportExceptionInterface
+     */
     #[Route('/mail/test', name: 'app_configuration_mail_test', methods: ['POST'])]
     public function configurationMailTest(Request $request, EntityManagerInterface $repository): Response
     {

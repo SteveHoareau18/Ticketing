@@ -29,22 +29,4 @@
             </div>
         </div>
     </div>
-    {% if "ROLE_ADMIN" in app.user.roles %}
-        <div class="flex flex-col justify-center items-center align-middle mt-3">
-            <div class="card w-96 bg-base-100 shadow-xl">
-                <div class="card-body text-center">
-                    <div class="card-title">
-                        <p class="badge badge-secondary">ADMINISTRATEUR DE LA PLATEFORME</p>
-                    </div>
-                    <div class="card-actions grid grid-cols-1 gap-4">
-                        <div>
-                            <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary">
-                                PARAMETRE MAIL
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}

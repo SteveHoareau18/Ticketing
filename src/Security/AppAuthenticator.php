@@ -26,6 +26,10 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     {
     }
 
+    /**
+     * Fonction dans l'interface qui permet de créer un passport avec l'utilisateur, son mot de passe et un jeton de sécurité
+     * @see AuthenticatorInterface
+     */
     public function authenticate(Request $request): Passport
     {
         $username = $request->request->get('username', '');
@@ -42,6 +46,14 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
+    /**
+     * Fonction dans l'interface qui est appelée lorsque l'utilisateur s'est bien authentifié
+     * @param Request $request
+     * @param TokenInterface $token
+     * @param string $firewallName
+     * @return Response|null
+     * @see AuthenticatorInterface
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
