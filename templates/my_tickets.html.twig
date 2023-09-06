@@ -40,7 +40,8 @@
             <div class="grid grid-cols-3 mt-3 gap-4">
                 {% set ticket_in_cat = false %}
                 {% for ticket in myTickets %}
-                    {% if status == "EN ATTENTE" or (ticket.treatments.last != false and ticket.treatments.last.status is not null) %}
+                    {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
+{#                        //TODO filtre par request#}
                         {% set ticket_in_cat = true %}
                         <div class="card bg-gray-200 shadow-xl">
                             <div class="card-body">
@@ -80,9 +81,16 @@
             </div>
         </div>
     </div>
+    {% if "ROLE_ADMIN" in app.user.roles %}
     <div class="mt-3 ml-2 mb-3 grid grid-cols-3 gap-4">
-        <a href="{{ path('app_main') }}" class="btn btn-success w-full">VOIR LE DASHBOARD</a>
+        {% if dashboard %}
+            <a href="{{ path('app_main') }}?dashboard=false" class="btn btn-success w-full">VOIR LES TICKETS DE MON
+                SERVICE</a>
+        {% else %}
+            <a href="{{ path('app_main') }}" class="btn btn-success w-full">VOIR LE DASHBOARD</a>
+        {% endif %}
         <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
         <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary w-full">PARAMETRE MAIL</a>
     </div>
+    {% endif %}
 {% endblock %}

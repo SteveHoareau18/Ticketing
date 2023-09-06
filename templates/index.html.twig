@@ -156,7 +156,7 @@
                                             {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
                                                 EN ATTENTE
                                             {% else %}
-                                                {{ ticket.treatments.last.status }}
+                                                {{ ticket.treatments.last.status }} // le ticket récupère le statut du dernier traitement
                                             {% endif %}</span>
                                         <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
                                         <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
