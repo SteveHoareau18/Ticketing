@@ -22,26 +22,26 @@
             {#            Affichage du dashboard #}
             <h1 class="text-center font-extrabold m-3">Tableau de bord administratif</h1>
             <div class="grid grid-cols-3 gap-4">
-                {% for service in serviceLst %}
+                {% for service in serviceLst %}{# on parcours la liste des service donné en paramètre lors du rendu de la vue depuis le controller #}
                     <div class="bg-gray-300 rounded-lg p-4">
-                        <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">
+                        <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">{# Possibilité de cliquer pour avoir + d'information #}
                             <div class="text-center">
                                 <span class="badge badge-secondary">{{ service.name }}</span>
                             </div>
-                            <div class="chart-container"
-                                 style="position: relative; height:40vh; width:80vw; margin-left: 20%">
-                                <canvas id="canvaService{{ service.id }}"></canvas>
+                            <div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-left: 20%">
+                                <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
                             </div>
                             <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
-                                <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>
-                                <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>
-                                <span id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>
+                                <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
                             </div>
                         </a>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
+            {# duplicata du mode user //TODO à paufiner pour pas faire de doublon de code #}
             <div>
                 <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
                 <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
@@ -119,7 +119,7 @@
             <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
             <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary w-full">PARAMETRE MAIL</a>
         </div>
-    {% else %}
+    {% else %}{# L'utilisateur n'est pas ADMIN -> Mode user #}
         <div>
             <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
             <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
@@ -144,8 +144,9 @@
                     {% endif %}
                 </div>
                 <div class="grid grid-cols-3 mt-3 gap-4">
-                    {% set ticket_in_cat = false %}
+                    {% set ticket_in_cat = false %}{# variable qui va servir à afficher ou pas le message de filtrage (instruction en bas) #}
                     {% for ticket in app.user.service.ticket %}
+                        {# status est la catégorie qui filtre par status et qui est defini en requete GET  #}
                         {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
                             {% set ticket_in_cat = true %}
                             <div class="card bg-gray-200 shadow-xl">
@@ -176,7 +177,7 @@
                             </div>
                         {% endif %}
                     {% endfor %}
-                    {% if not ticket_in_cat %}
+                    {% if not ticket_in_cat %}{# ... #}
                         Il n'y a pas de ticket dans cette catégorie...
                     {% endif %}
                 </div>
@@ -188,39 +189,42 @@
             let ctx;
             let chart;
             let ms = [];
-            {% for service in serviceLst %}
+            {% for service in serviceLst %}/*On parcours la liste des services*/
             ctx = document.getElementById('canvaService{{ service.id }}');
 
+            //Création de la requête AJAX en POST
             $.ajax({
                 type: 'POST',
-                url: '/api/count-tickets/{{ service.id }}/',
+                url: '{{ path('app_api_count_tickets_service', {'service':service.id}) }}',
                 data: {_csrf_token: "{{ csrf_token('api-count'~service.id) }}"},
-                success: function (response) {
-                    if (response !== 500) {
-                        ms["{{ service.id }}"].data.datasets[0].data[0] = parseFloat(response[0]);
+                success: function (response) {//s'il n'y pas d'erreur
+                    if (response !== 500) {//la route peut retourner new JsonResponse(500)
+                        ms["{{ service.id }}"].data.datasets[0].data[0] = parseFloat(response[0]);//Set du data par rapport à la response dans le Chart
                         ms["{{ service.id }}"].data.datasets[0].data[1] = parseFloat(response[1]);
                         ms["{{ service.id }}"].data.datasets[0].data[2] = parseFloat(response[2]);
+                        //tableau de longueur 3 car il y a 3 types de tickets
                         ms["{{ service.id }}"].update();
-                        console.log(response)
-                        $('#waitingBadgeIdService{{ service.id }}').html("Ticket EN ATTENTE: " + response[0]);
+                        console.log(response);
+                        $('#waitingBadgeIdService{{ service.id }}').html("Ticket EN ATTENTE: " + response[0]);//Mise a jour du badge qui affiche le nombre de tickets
                         $('#inProgressBadgeIdService{{ service.id }}').html("Ticket EN COURS: " + response[1]);
                         $('#closeBadgeIdService{{ service.id }}').html("Ticket FERMÉ: " + response[2]);
                     } else {
                         console.error('Erreur lors de la requête. (500)');
                     }
                 },
-                error: function () {
-                    console.error('Erreur lors de la requête.');
+                error: function (error) {//il peut avoir une erreur
+                    console.error('Erreur lors de la requête. '+error);
                 }
             });
 
+            //Création d'un diagramme
             chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: [],
                     datasets: [{
                         label: '',
-                        data: [1, 1, 1],
+                        data: [1, 1, 1],//défaut 3 types de valeur 1, c'est le poids que ça prendra dans le diagramme
                         backgroundColor: [
                             'rgb(255, 99, 132)',
                             'rgb(54, 162, 235)',

@@ -117,7 +117,7 @@ class MainController extends AbstractController
         ]);
     }
 
-//    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST','GET'])]
+//    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST','GET'])] -> pour tester
 
     /**
      * @param Request $request
@@ -125,42 +125,33 @@ class MainController extends AbstractController
      * @param $service
      * @return JsonResponse
      */
-    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST'])]
+    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST'])]//on tolère uniquement les requêtes POST
     public function apiCount(Request $request, EntityManagerInterface $manager, $service): JsonResponse
     {
-        if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('api-count' . $service, $request->request->get('_csrf_token'))) {
+        if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('api-count' . $service, $request->request->get('_csrf_token'))) {//On vérifie la validité du jeton
             $service = $manager->getRepository(Service::class)->find($service);
             if ($service != null) {
-                $treatments = $manager->getRepository(Treatment::class)->findBy(['status' => 'Fermé']);
                 $nClose = 0;
-                foreach ($treatments as $treatment) {
-                    if ($treatment->getTicket()->getService()->getId() == $service->getId()) $nClose += 1;
-                }
-
-                $treatments = $manager->getRepository(Treatment::class)->findBy(['status' => 'EN COURS']);
                 $nInProgress = 0;
-                foreach ($treatments as $treatment) {
-                    if ($treatment->getTicket()->getService()->getId() == $service->getId()) $nInProgress += 1;
-                }
-
-                $treatments = $manager->getRepository(Treatment::class)->findBy(['status' => 'EN ATTENTE']);
                 $nWaiting = 0;
-                foreach ($treatments as $treatment) {
-                    if ($treatment->getTicket()->getService()->getId() == $service->getId()) $nWaiting += 1;
-                }
-                if ($nWaiting == 0) {
-                    $tickets = $manager->getRepository(Ticket::class)->findBy(['service' => $service]);
-                    foreach ($tickets as $ticket) {
-                        if (sizeof($ticket->getTreatments()) == 0) {
-                            $nWaiting += 1;
-                        } else {
-                            if (str_contains($ticket->getTreatments()->last()->getStatus(), "EN ATTENTE")) {
-                                $nWaiting += 1;
-                            }
-                        }
+                $tickets = $manager->getRepository(Ticket::class)->findBy(['service'=>$service]);
+                foreach ($tickets as $ticket){
+                    //on récupère les tickets qui sont fermés (ayant une date de résultat) ou dont il y a traitements et que le status du dernier traitement est fermé
+//                    dd($ticket->getTreatments(),sizeof($ticket->getTreatments()));
+                    if(sizeof($ticket->getTreatments()) == 0) {
+                        $nWaiting += 1;
+                    }else if($ticket->getTreatments()->last()->getStatus() == "EN ATTENTE" || str_contains($ticket->getTreatments()->last()->getStatus(), "EN ATTENTE")) {
+                        //les tickets qui n'ont pas encore de traitement sont par défaut en attente, on traite le comptage de ces tickets ci-dessous
+                        $nWaiting += 1;
+                    }else if($ticket->getTreatments()->last()->getStatus() == "EN COURS"){
+                        $nInProgress += 1;
+                    }else if($ticket->getResultDate()!=null || $ticket->getTreatments()->last()->getStatus() == "Fermé"){
+                        $nClose+=1;
                     }
                 }
-                return new JsonResponse(array($nWaiting, $nInProgress, $nClose));
+
+                dump(array($nWaiting, $nInProgress, $nClose));
+                return new JsonResponse(array($nWaiting, $nInProgress, $nClose));//on retourne un JsonResponse d'un array de chaque compteur
             }
         }
         return new JsonResponse(500);
