@@ -164,4 +164,9 @@ class Ticket
 
         return $this;
     }
+
+    public function getStatus(): string{
+        if(sizeof($this->getTreatments())==0 || !$this->getTreatments()->last()) return "EN ATTENTE";
+        return $this->getTreatments()->last()->getStatus();
+    }
 }

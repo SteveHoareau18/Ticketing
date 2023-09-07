@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ticketing{% endblock %}
+{% block title %}Ticketing | Les tickets que j'ai crées{% endblock %}
 
 {% block body %}
     {% if not app.user.active %}
@@ -19,7 +19,7 @@
         <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
         <a class="btn btn-ghost" href="{{ path('app_main') }}?dashboard=false">VOIR LES TICKETS DE MON SERVICE</a>
         <a class="btn btn-success" href="{{ path('app_main_my_tickets') }}">VOIR LES TICKETS QUE J'AI CREER</a>
-        <div class="text-center">
+        <div class="text-center mt-1">
             <div>
                 {% if status == "EN ATTENTE" %}
                     <a class="btn btn-success" href="{{ path('app_main_my_tickets') }}">EN ATTENTE</a>
@@ -40,22 +40,13 @@
             <div class="grid grid-cols-3 mt-3 gap-4">
                 {% set ticket_in_cat = false %}
                 {% for ticket in myTickets %}
-                    {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
-                        {#                        //TODO filtre par request #}
+                    {% if status in ticket.getStatus %}
                         {% set ticket_in_cat = true %}
                         <div class="card bg-gray-200 shadow-xl">
                             <div class="card-body">
                                 <h2 class="card-title">
-                                    <span class="badge badge-primary">
-                                        Service {{ ticket.service.name }}
-                                    </span>
-                                    <span class="badge badge-warning">
-                                        {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
-                                            EN ATTENTE
-                                        {% else %}
-                                            {{ ticket.treatments.last.status }}
-                                        {% endif %}
-                                    </span>
+                                    <span class="badge badge-primary">Service {{ ticket.service.name }}</span>
+                                    <span class="badge badge-warning">{{ ticket.getStatus }}</span>
                                     <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
                                     <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
                                     <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span>

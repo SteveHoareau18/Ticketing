@@ -63,9 +63,17 @@ class MainController extends AbstractController
         if (!$this->getUser()) return $this->redirectToRoute("app_login");
         $myTickets = $managerRegistry->getRepository(Ticket::class)->findBy(['creator' => $this->getUser()]);
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';
-        return $this->render('my_tickets.html.twig', [
+        $dashboard = false;
+        if (in_array("ROLE_ADMIN", $this->getUser()->getRoles())) {//Permet d'afficher ou non le dashboard en administrateur
+            $dashboard = true;
+            if ($request->query->has('dashboard')) {
+                $dashboard = $request->query->getBoolean('dashboard');
+            }
+        }
+        return $this->render('ticket/see.my_tickets.html.twig', [
             'myTickets' => $myTickets,
-            'status' => $status
+            'status' => $status,
+            'dashboard'=>$dashboard
         ]);
     }
 

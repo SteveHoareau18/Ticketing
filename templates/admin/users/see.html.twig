@@ -80,8 +80,8 @@
                         console.error('Erreur lors de la requête. (500)');
                     }
                 },
-                error: function () {
-                    console.error('Erreur lors de la requête.');
+                error: function (error) {
+                    console.error('Erreur lors de la requête. '+error);
                 }
             });
 
@@ -93,9 +93,9 @@
                         label: '',
                         data: [1, 1, 1],
                         backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(123,255,86)'
+                            'rgb(224, 61, 97)',
+                            'rgb(164, 199, 239)',
+                            'rgb(24, 175, 130)'
                         ],
                         hoverOffset: 2
                     }],

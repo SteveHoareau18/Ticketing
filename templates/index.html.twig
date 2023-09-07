@@ -16,178 +16,54 @@
             </div>
         </div>
     {% endif %}
-    {% if "ROLE_ADMIN" in app.user.roles %}
-        {#        Mode admin #}
-        {% if dashboard == true %}
-            {#            Affichage du dashboard #}
-            <h1 class="text-center font-extrabold m-3">Tableau de bord administratif</h1>
-            <div class="grid grid-cols-3 gap-4">
-                {% for service in serviceLst %}{# on parcours la liste des service donné en paramètre lors du rendu de la vue depuis le controller #}
-                    <div class="bg-gray-300 rounded-lg p-4">
-                        <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">{# Possibilité de cliquer pour avoir + d'information #}
-                            <div class="text-center">
-                                <span class="badge badge-secondary">{{ service.name }}</span>
-                            </div>
-                            <div class="chart-container"
-                                 style="position: relative; height:40vh; width:80vw; margin-left: 20%">
-                                <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
-                            </div>
-                            <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
-                                <span id="waitingBadgeIdService{{ service.id }}"
-                                      class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
-                                <span id="inProgressBadgeIdService{{ service.id }}"
-                                      class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
-                                <span id="closeBadgeIdService{{ service.id }}"
-                                      class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            {# duplicata du mode user //TODO à paufiner pour pas faire de doublon de code #}
+    <div>
+        {% if "ROLE_ADMIN" in app.user.roles %}
+            {#        Mode admin #}
             <div>
-                <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
-                <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
-                <a class="btn btn-ghost" href="{{ path('app_main_my_tickets') }}">VOIR LES TICKETS QUE J'AI CREER</a>
-                <div class="text-center">
-                    <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
-                    <div>
-                        {% if status == "EN ATTENTE" %}
-                            <a class="btn btn-success" href="{{ path('app_main') }}?dashboard=false">EN ATTENTE</a>
-                        {% else %}
-                            <a class="btn btn-ghost" href="{{ path('app_main') }}?dashboard=false">EN ATTENTE</a>
-                        {% endif %}
-                        {% if status == "EN COURS" %}
-                            <a class="btn btn-success" href="{{ path('app_main') }}?status=EN_COURS&dashboard=false">EN
-                                COURS</a>
-                        {% else %}
-                            <a class="btn btn-ghost" href="{{ path('app_main') }}?status=EN_COURS&dashboard=false">EN
-                                COURS</a>
-                        {% endif %}
-                        {% if status == "Fermé" %}
-                            <a class="btn btn-success"
-                               href="{{ path('app_main') }}?status=Fermé&dashboard=false">FERMÉ</a>
-                        {% else %}
-                            <a class="btn btn-ghost"
-                               href="{{ path('app_main') }}?status=Fermé&dashboard=false">FERMÉ</a>
-                        {% endif %}
-                    </div>
-                    <div class="grid grid-cols-3 mt-3 gap-4">
-                        {% set ticket_in_cat = false %}
-                        {% for ticket in app.user.service.ticket %}
-                            {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
-                                {% set ticket_in_cat = true %}
-                                <div class="card bg-gray-200 shadow-xl">
-                                    <div class="card-body">
-                                        <h2 class="card-title">
-                                        <span class="badge badge-warning">
-                                            {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
-                                                EN ATTENTE
-                                            {% else %}
-                                                {{ ticket.treatments.last.status }}
-                                            {% endif %}</span>
-                                            <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
-                                            <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
-                                            <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
-                                        <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
-                                        <p>Traitement: {{ ticket.treatments|length }}</p>
-                                        <div class="card-actions justify-end">
-                                            <a class="btn btn-primary"
-                                               href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
-                                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
+                {% if dashboard == true %}
+                    {#            Affichage du dashboard #}
+                    <h1 class="text-center font-extrabold m-3">Tableau de bord administratif</h1>
+                    <div class="grid grid-cols-3 gap-4">
+                        {% for service in serviceLst %}{# on parcours la liste des service donné en paramètre lors du rendu de la vue depuis le controller #}
+                            <div class="bg-gray-300 rounded-lg p-4">
+                                <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">{# Possibilité de cliquer pour avoir + d'information #}
+                                    <div class="text-center">
+                                        <span class="badge badge-secondary">{{ service.name }}</span>
                                     </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                        {% if not ticket_in_cat %}
-                            Il n'y a pas de ticket dans cette catégorie...
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-        <div class="mt-3 ml-2 mb-3 grid grid-cols-3 gap-4">
-            {% if dashboard %}
-                <a href="{{ path('app_main') }}?dashboard=false" class="btn btn-success w-full">VOIR LES TICKETS DE MON
-                    SERVICE</a>
-            {% else %}
-                <a href="{{ path('app_main') }}" class="btn btn-success w-full">VOIR LE DASHBOARD</a>
-            {% endif %}
-            <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
-            <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary w-full">PARAMETRE MAIL</a>
-        </div>
-    {% else %}{# L'utilisateur n'est pas ADMIN -> Mode user #}
-        <div>
-            <a class="btn btn-secondary shadow-2xl ml-1" href="{{ path('app_ticket_new') }}">CRÉER UN TICKET</a>
-            <a class="btn btn-success" href="{{ path('app_main') }}">VOIR LES TICKETS DE MON SERVICE</a>
-            <a class="btn btn-ghost" href="{{ path('app_main_my_tickets') }}">VOIR LES TICKETS QUE J'AI CREER</a>
-            <div class="text-center">
-                <h1 class="badge badge-primary">SERVICE {{ app.user.service.name }}</h1>
-                <div>
-                    {% if status == "EN ATTENTE" %}
-                        <a class="btn btn-success" href="{{ path('app_main') }}">EN ATTENTE</a>
-                    {% else %}
-                        <a class="btn btn-ghost" href="{{ path('app_main') }}">EN ATTENTE</a>
-                    {% endif %}
-                    {% if status == "EN COURS" %}
-                        <a class="btn btn-success" href="{{ path('app_main') }}?status=EN_COURS">EN COURS</a>
-                    {% else %}
-                        <a class="btn btn-ghost" href="{{ path('app_main') }}?status=EN_COURS">EN COURS</a>
-                    {% endif %}
-                    {% if status == "Fermé" %}
-                        <a class="btn btn-success" href="{{ path('app_main') }}?status=Fermé">FERMÉ</a>
-                    {% else %}
-                        <a class="btn btn-ghost" href="{{ path('app_main') }}?status=Fermé">FERMÉ</a>
-                    {% endif %}
-                </div>
-                <div class="grid grid-cols-3 mt-3 gap-4">
-                    {% set ticket_in_cat = false %}{# variable qui va servir à afficher ou pas le message de filtrage (instruction en bas) #}
-                    {% for ticket in app.user.service.ticket %}
-                        {# status est la catégorie qui filtre par status et qui est defini en requete GET  #}
-                        {% if status == "EN ATTENTE" or (ticket.treatments.last != false and status in ticket.treatments.last.status) %}
-                            {% set ticket_in_cat = true %}
-                            <div class="card bg-gray-200 shadow-xl">
-                                <div class="card-body">
-                                    <h2 class="card-title">
-                                        <span class="badge badge-warning">
-                                            {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
-                                                EN ATTENTE
-                                            {% else %}
-                                                {{ ticket.treatments.last.status }} // le ticket récupère le statut du dernier traitement
-                                            {% endif %}</span>
-                                        <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
-                                        <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
-                                        <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
-                                    <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
-                                    <p>Traitement: {{ ticket.treatments|length }}</p>
-                                    <div class="card-actions justify-end">
-                                        <a class="btn btn-primary"
-                                           href="{{ path('app_ticket_see',{'id': ticket.id }) }}">voir
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                 fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
-                                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                                            </svg>
-                                        </a>
+                                    <div class="chart-container"
+                                         style="position: relative; height:40vh; width:80vw; margin-left: 20%">
+                                        <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
                                     </div>
-                                </div>
+                                    <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
+                                        <span id="waitingBadgeIdService{{ service.id }}"
+                                              class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
+                                        <span id="inProgressBadgeIdService{{ service.id }}"
+                                              class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
+                                        <span id="closeBadgeIdService{{ service.id }}"
+                                              class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
+                                    </div>
+                                </a>
                             </div>
-                        {% endif %}
-                    {% endfor %}
-                    {% if not ticket_in_cat %}{# ... #}
-                        Il n'y a pas de ticket dans cette catégorie...
-                    {% endif %}
-                </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ include('ticket/see.one_service_tickets.html.twig') }}
+                {% endif %}
             </div>
-        </div>
-    {% endif %}
+            <div class="mt-3 ml-2 mb-3 grid grid-cols-3 gap-4">
+                {% if dashboard %}
+                    <a href="{{ path('app_main') }}?dashboard=false" class="btn btn-success w-full">VOIR LES TICKETS DE MON
+                        SERVICE</a>
+                {% else %}
+                    <a href="{{ path('app_main') }}" class="btn btn-success w-full">VOIR LE DASHBOARD</a>
+                {% endif %}
+                <a href="{{ path('app_user') }}" class="btn btn-primary w-full">GESTION DES UTILISATEURS</a>
+                <a href="{{ path('app_configuration_mail') }}" class="btn btn-primary w-full">PARAMETRE MAIL</a>
+            </div>
+        {% else %}{# L'utilisateur n'est pas ADMIN -> Mode user #}
+            {{ include('ticket/see.one_service_tickets.html.twig') }}
+        {% endif %}
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             let ctx;
@@ -230,9 +106,9 @@
                         label: '',
                         data: [1, 1, 1],//défaut 3 types de valeur 1, c'est le poids que ça prendra dans le diagramme
                         backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(123,255,86)'
+                            'rgb(224, 61, 97)',
+                            'rgb(164, 199, 239)',
+                            'rgb(24, 175, 130)'
                         ],
                         hoverOffset: 2
                     }],
