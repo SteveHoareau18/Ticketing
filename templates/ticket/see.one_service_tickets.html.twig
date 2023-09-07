@@ -23,14 +23,14 @@
         </div>
         <div class="grid grid-cols-3 mt-3 gap-4">
             {% set ticket_in_cat = false %}{# variable qui va servir à afficher ou pas le message de filtrage (instruction en bas) #}
-            {% for ticket in app.user.service.ticket %}
+            {% for ticket in app.user.service.tickets|sort((a,b) => b.createDate <=> a.createDate) %}
                 {# status est la catégorie qui filtre par status et qui est defini en requete GET  #}
                 {% if status in ticket.getStatus %}
                     {% set ticket_in_cat = true %}
                     <div class="card bg-gray-200 shadow-xl">
                         <div class="card-body">
                             <h2 class="card-title">
-                                <span class="badge badge-warning">{{ ticket.getStatus }}</span>
+                                <span class="badge badge-warning">{{ ticket.getStatus|upper }}</span>
                                 <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
                                 <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
                                 <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>

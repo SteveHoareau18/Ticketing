@@ -19,14 +19,14 @@ class Service
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'service', targetEntity: Ticket::class)]
-    private Collection $ticket;
+    private Collection $tickets;
 
     #[ORM\OneToMany(mappedBy: 'service', targetEntity: User::class)]
     private Collection $Users;
 
     public function __construct()
     {
-        $this->ticket = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
         $this->Users = new ArrayCollection();
     }
 
@@ -50,15 +50,15 @@ class Service
     /**
      * @return Collection<int, Ticket>
      */
-    public function getTicket(): Collection
+    public function getTickets(): Collection
     {
-        return $this->ticket;
+        return $this->tickets;
     }
 
     public function addTicket(Ticket $ticket): static
     {
-        if (!$this->ticket->contains($ticket)) {
-            $this->ticket->add($ticket);
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
             $ticket->setService($this);
         }
 
@@ -67,7 +67,7 @@ class Service
 
     public function removeTicket(Ticket $ticket): static
     {
-        if ($this->ticket->removeElement($ticket)) {
+        if ($this->tickets->removeElement($ticket)) {
             // set the owning side to null (unless already changed)
             if ($ticket->getService() === $this) {
                 $ticket->setService(null);

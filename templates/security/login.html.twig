@@ -27,7 +27,7 @@
             <h1 class="mb-3 mt-3 font-extrabold text-center">Connectez-vous !</h1>
             <label for="inputUsername" class="label font-bold w-full">Identifiant</label>
             <input type="text" value="{{ last_username }}" name="username" id="inputUsername"
-                   class="input input-bordered w-full mt-3 bg-white" autocomplete="username" required autofocus>
+                   class="input input-bordered w-full mt-3 bg-white" autocomplete="username" required autofocus min="0" max="100">
             <label for="inputPassword" class="label font-bold w-full">Mot de passe</label>
             <input type="password" name="password" id="inputPassword" class="input input-bordered w-full mt-3 bg-white"
                    autocomplete="current-password" required>

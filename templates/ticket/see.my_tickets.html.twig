@@ -39,14 +39,14 @@
             </div>
             <div class="grid grid-cols-3 mt-3 gap-4">
                 {% set ticket_in_cat = false %}
-                {% for ticket in myTickets %}
+                {% for ticket in myTickets|sort((a,b) => b.createDate <=> a.createDate) %}
                     {% if status in ticket.getStatus %}
                         {% set ticket_in_cat = true %}
                         <div class="card bg-gray-200 shadow-xl">
                             <div class="card-body">
                                 <h2 class="card-title">
                                     <span class="badge badge-primary">Service {{ ticket.service.name }}</span>
-                                    <span class="badge badge-warning">{{ ticket.getStatus }}</span>
+                                    <span class="badge badge-warning">{{ ticket.getStatus|upper }}</span>
                                     <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>
                                     <span class="badge badge-ghost">{% if ticket.resultDate is not null %}Fermé le: {{ ticket.resultDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
                                     <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span>

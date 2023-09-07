@@ -38,6 +38,7 @@ class MainController extends AbstractController
         if (!$this->getUser()) return $this->redirectToRoute("app_login"); //Redirige l'utilisateur vers la page de connexion s'il n'est pas connecté
         $serviceLst = $managerRegistry->getRepository(Service::class)->findAll();//Sert pour le mode admin
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';//Système de filtre pour les tickets
+        if($status != "EN ATTENTE" && $status != "EN COURS" && $status != "Fermé") $status = "EN ATTENTE";
         $dashboard = false;
         if (in_array("ROLE_ADMIN", $this->getUser()->getRoles())) {//Permet d'afficher ou non le dashboard en administrateur
             $dashboard = true;
@@ -63,6 +64,7 @@ class MainController extends AbstractController
         if (!$this->getUser()) return $this->redirectToRoute("app_login");
         $myTickets = $managerRegistry->getRepository(Ticket::class)->findBy(['creator' => $this->getUser()]);
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';
+        if($status != "EN ATTENTE" && $status != "EN COURS" && $status != "Fermé") $status = "EN ATTENTE";
         $dashboard = false;
         if (in_array("ROLE_ADMIN", $this->getUser()->getRoles())) {//Permet d'afficher ou non le dashboard en administrateur
             $dashboard = true;

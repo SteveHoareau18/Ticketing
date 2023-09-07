@@ -91,7 +91,7 @@ class TicketController extends AbstractController
         $ticket = $registry->getRepository(Ticket::class)->find($id);
         if ($ticket == null) return $this->redirectToRoute("app_main");
         if ($ticket->getCreator()->getId() == $user->getId() || $ticket->getService()->getId() == $user->getService()->getId()) {
-            $treatment = $registry->getRepository(Treatment::class)->findOneBy(['caterer' => $user]);
+            $treatment = $registry->getRepository(Treatment::class)->findOneBy(['caterer' => $user, 'ticket'=>$ticket]);
             if ($treatment != null && $treatment->getStatus() == "EN COURS") {
                 $this->addFlash('fail', 'Vous avez déjà ouvert un traitement...');
             } else {

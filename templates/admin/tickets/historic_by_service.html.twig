@@ -7,7 +7,7 @@
         <h1 class="font-extrabold m-3">Historique</h1>
         <h2 class="badge badge-primary">SERVICE {{ service.name }}</h2>
         <div class="grid grid-cols-3 mt-3 gap-4">
-            {% for ticket in service.ticket %}
+            {% for ticket in service.tickets|sort((a,b) => b.createDate <=> a.createDate) %}
                 <div class="card bg-gray-200 shadow-xl">
                     <div class="card-body">
                         <h2 class="card-title">
@@ -15,7 +15,7 @@
                             {% if ticket.treatments.last == false or ticket.treatments.last.status is null %}
                                 EN ATTENTE
                             {% else %}
-                                {{ ticket.treatments.last.status }}
+                                {{ ticket.treatments.last.status|upper }}
                             {% endif %}
                         </span>
                             <span class="badge badge-ghost">Ouvert le: {{ ticket.createDate|date('d/m/Y H:i') }}</span>

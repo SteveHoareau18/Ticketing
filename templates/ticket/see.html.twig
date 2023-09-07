@@ -39,7 +39,7 @@
                             </a>
                         {% else %}
                             {% if ticket.resultDate is null %}
-                                <button class="btn btn-error" onclick="transferModal.showModal()">Transférer</button>
+                                <button class="btn btn-error" onclick="transferModal.showModal()">TRANSFÉRR</button>
                                 <dialog id="transferModal" class="modal">
                                     <div class="modal-box">
                                         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕
@@ -73,7 +73,7 @@
             <div class="card bg-gray-200 shadow-xl">
                 <div class="card-body">
                     <h2 class="card-title">
-                        <span class="badge badge-warning">{{ treatment.status }}</span>
+                        <span class="badge badge-warning">{{ treatment.status|upper }}</span>
                         <span class="badge badge-ghost">Commencé le {{ treatment.startDate|date('d/m/Y H:i') }}</span><span
                                 class="badge badge-ghost">{% if treatment.endDate is not null %}Fini le {{ treatment.endDate|date('d/m/Y H:i') }}{% else %}-{% endif %}</span>
                     </h2>
@@ -83,7 +83,7 @@
                         {% if treatment.user == app.user %}
                             {% if treatment.endDate is null %}
                                 <!-- Open the modal using ID.showModal() method -->
-                                <button class="btn btn-primary" onclick="closeModal.showModal()">terminer</button>
+                                <button class="btn btn-primary" onclick="closeModal.showModal()">TERMINER</button>
                                 <dialog id="closeModal" class="modal">
                                     <form method="post" class="modal-box"
                                           action="{{ path('app_ticket_close',{'id':ticket.id}) }}">
@@ -101,7 +101,7 @@
                                 </dialog>
                             {% endif %}
                         {% else %}
-                            {% if treatment.status != "RELAYÉ" %}
+                            {% if treatment.ticket.service.id == app.user.service.id and treatment.status != "RELAYÉ" %}
                                 <a class="btn btn-primary"
                                    href="{{ path('app_ticket_relayed',{'id': ticket.id,'treatment':treatment.id}) }}">
                                     PRENDRE LE RELAIS

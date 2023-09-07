@@ -3,5 +3,26 @@
 {% block title %}Ticketing | Ouvrir un nouveau ticket{% endblock %}
 
 {% block body %}
-    {{ include('ticket/treatment/_form.html.twig',{'ticket':ticket}) }}
+    <div class="flex flex-col justify-center items-center align-middle">
+        <div class="card bg-gray-200 shadow-xl mb-3">
+            <div class="card-body text-center">
+                <h2 class="card-title text-center">
+                    <span class="badge badge-ghost">Ouvert le {{ ticket.createDate|date('d/m/Y H:i') }}</span>
+                    {% if ticket.resultDate is not null %}
+                        <span class="badge badge-ghost">Fermer le {{ ticket.resultDate|date('d/m/Y H:i') }}</span>
+                    {% endif %}
+                    <span class="badge badge-secondary">TICKET T°{{ ticket.id }}</span></h2>
+                <p>Créer par {{ ticket.creator.firstname ~ " " ~ticket.creator.name }}</p>
+                <p>Traitement: {{ ticket.treatments|length }}</p>
+                <p>Raison d'ouverture: {{ ticket.problem }}</p>
+                {% if ticket.result is not null %}
+                    <h3>
+                        <span class="badge badge-primary ">Fermé par: {{ ticket.treatments.last.user.firstname ~ " " ~ticket.treatments.last.user.name }}</span>
+                        <span class="badge badge-outline">Raison de fermeture: {{ ticket.result }}</span></h3>
+                {% endif %}
+            </div>
+        </div>
+        <h3 class="text-center font-extrabold">Nouveau traitement</h3>
+        {{ include('ticket/treatment/_form.html.twig',{'ticket':ticket}) }}
+    </div>
 {% endblock %}
