@@ -28,13 +28,17 @@
                             <div class="text-center">
                                 <span class="badge badge-secondary">{{ service.name }}</span>
                             </div>
-                            <div class="chart-container" style="position: relative; height:40vh; width:80vw; margin-left: 20%">
+                            <div class="chart-container"
+                                 style="position: relative; height:40vh; width:80vw; margin-left: 20%">
                                 <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
                             </div>
                             <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
-                                <span id="waitingBadgeIdService{{ service.id }}" class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
-                                <span id="inProgressBadgeIdService{{ service.id }}" class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
-                                <span id="closeBadgeIdService{{ service.id }}" class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="waitingBadgeIdService{{ service.id }}"
+                                      class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="inProgressBadgeIdService{{ service.id }}"
+                                      class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
+                                <span id="closeBadgeIdService{{ service.id }}"
+                                      class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
                             </div>
                         </a>
                     </div>
@@ -213,7 +217,7 @@
                     }
                 },
                 error: function (error) {//il peut avoir une erreur
-                    console.error('Erreur lors de la requête. '+error);
+                    console.error('Erreur lors de la requête. ' + error);
                 }
             });
 

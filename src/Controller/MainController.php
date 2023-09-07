@@ -134,19 +134,19 @@ class MainController extends AbstractController
                 $nClose = 0;
                 $nInProgress = 0;
                 $nWaiting = 0;
-                $tickets = $manager->getRepository(Ticket::class)->findBy(['service'=>$service]);
-                foreach ($tickets as $ticket){
+                $tickets = $manager->getRepository(Ticket::class)->findBy(['service' => $service]);
+                foreach ($tickets as $ticket) {
                     //on récupère les tickets qui sont fermés (ayant une date de résultat) ou dont il y a traitements et que le status du dernier traitement est fermé
 //                    dd($ticket->getTreatments(),sizeof($ticket->getTreatments()));
-                    if(sizeof($ticket->getTreatments()) == 0) {
+                    if (sizeof($ticket->getTreatments()) == 0) {
                         $nWaiting += 1;
-                    }else if($ticket->getTreatments()->last()->getStatus() == "EN ATTENTE" || str_contains($ticket->getTreatments()->last()->getStatus(), "EN ATTENTE")) {
+                    } else if ($ticket->getTreatments()->last()->getStatus() == "EN ATTENTE" || str_contains($ticket->getTreatments()->last()->getStatus(), "EN ATTENTE")) {
                         //les tickets qui n'ont pas encore de traitement sont par défaut en attente, on traite le comptage de ces tickets ci-dessous
                         $nWaiting += 1;
-                    }else if($ticket->getTreatments()->last()->getStatus() == "EN COURS"){
+                    } else if ($ticket->getTreatments()->last()->getStatus() == "EN COURS") {
                         $nInProgress += 1;
-                    }else if($ticket->getResultDate()!=null || $ticket->getTreatments()->last()->getStatus() == "Fermé"){
-                        $nClose+=1;
+                    } else if ($ticket->getResultDate() != null || $ticket->getTreatments()->last()->getStatus() == "Fermé") {
+                        $nClose += 1;
                     }
                 }
 
