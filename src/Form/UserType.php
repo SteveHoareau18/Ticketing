@@ -15,7 +15,7 @@ class UserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                "label" => "Identifiant",
+                "label" => "Nom d'utilisateur",
                 'label_attr' => ['class' => 'label'],
                 'attr' => ['class' => 'input input-bordered', 'placeholder' => 'jdoe'],
                 "mapped" => true,

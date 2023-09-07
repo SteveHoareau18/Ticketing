@@ -56,6 +56,8 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if ($manager->getRepository(User::class)->findBy(['username' => $user->getUsername()])) {
                 $this->addFlash("fail", "Ce nom n'utilisateur est déjà pris...");
+            }else if($manager->getRepository(User::class)->findBy(['email'=>$user->getEmail()])){
+                $this->addFlash("fail", "Cet adresse mail est déjà prise...");
             } else {
                 $service = $manager->getRepository(Service::class)->find($form->get("service")->getData());
                 if ($service == null) {
@@ -130,6 +132,7 @@ class UserController extends AbstractController
         if ($user == null) {
             return $this->redirectToRoute("app_user");
         }
+        $oldUser = array("username"=>$user->getUsername(),"email"=>$user->getEmail());//atomic
         $form = $this->createForm(UserType::class, $user);
         $form->get("service")->setData($user->getService()->getId());
         $form->handleRequest($request);
@@ -138,11 +141,17 @@ class UserController extends AbstractController
             if ($service == null) {
                 $this->addFlash("fail", "Ce service n'existe pas...");
             } else {
-                $user->setService($service);
-                $manager->persist($user);
-                $manager->flush();
-                $this->addFlash("success", "Utilisateur " . $user->getUsername() . " modifié avec succès.");
-                return $this->redirectToRoute("app_user_see", ['username' => $username]);
+                if($oldUser['email']!=$user->getEmail() && $manager->getRepository(User::class)->findBy(['email'=>$user->getEmail()])) {
+                    $this->addFlash('fail', 'Cet adresse mail est déjà prise...');
+                }elseif ($oldUser['username']!=$user->getUsername() && $manager->getRepository(User::class)->findBy(['username'=>$user->getUsername()])){
+                    $this->addFlash('fail', "Ce nom d'utilisateur est déjà pris...");
+                } else {
+                    $user->setService($service);
+                    $manager->persist($user);
+                    $manager->flush();
+                    $this->addFlash("success", "Utilisateur " . $user->getUsername() . " modifié avec succès.");
+                    return $this->redirectToRoute("app_user_see", ['username' => $username]);
+                }
 
             }
         }
