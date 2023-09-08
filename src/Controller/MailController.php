@@ -30,6 +30,7 @@ class MailController extends AbstractController
     #[Route('/mail', name: 'app_configuration_mail')]
     public function configurationMail(MailConfigurationRepository $repository): Response
     {
+        set_time_limit(0);
         $mailConfigs = $repository->findAll();
         if (sizeof($mailConfigs) == 0) {
             return $this->redirectToRoute("app_configuration_mail_new");
@@ -46,6 +47,7 @@ class MailController extends AbstractController
     #[Route('/mail/new', name: 'app_configuration_mail_new')]
     public function configurationMailNew(Request $request, EntityManagerInterface $repository): Response
     {
+        set_time_limit(0);
         $mailConfig = new MailConfiguration();
 
         $form = $this->createForm(MailConfigurationType::class, $mailConfig);
@@ -76,6 +78,7 @@ class MailController extends AbstractController
     #[Route('/mail/edit', name: 'app_configuration_mail_edit')]
     public function configurationMailEdit(Request $request, EntityManagerInterface $repository): Response
     {
+        set_time_limit(0);
         $mailConfig = $repository->getRepository(MailConfiguration::class)->findAll()[0];
         $form = $this->createForm(MailConfigurationType::class, $mailConfig);
         $form->handleRequest($request);
@@ -105,6 +108,7 @@ class MailController extends AbstractController
     #[Route('/mail/test', name: 'app_configuration_mail_test', methods: ['POST'])]
     public function configurationMailTest(Request $request, EntityManagerInterface $repository): Response
     {
+        set_time_limit(0);
         if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('test-parameter', $request->request->get('_csrf_token'))) {
             $mailConfiguration = $repository->getRepository(MailConfiguration::class)->findAll()[0];
             try {

@@ -9,6 +9,7 @@ use App\Entity\Treatment;
 use App\Entity\User;
 use App\Form\TicketType;
 use App\Form\TreatmentType;
+use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,6 +30,7 @@ class TicketController extends AbstractController
     #[Route('/new', name: 'app_ticket_new')]
     public function new(Request $request, EntityManagerInterface $registry): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -43,7 +45,7 @@ class TicketController extends AbstractController
                 $this->addFlash('fail', "Ce service n'existe pas...");
             } else {
                 $ticket->setService($service);
-                $ticket->setCreateDate(new \DateTime("now", new DateTimeZone($_ENV["DATETIMEZONE"])));
+                $ticket->setCreateDate(new DateTime("now", new DateTimeZone($_ENV["DATETIMEZONE"])));
                 $registry->persist($ticket);
                 $registry->flush();
                 $this->addFlash('success', "Vous avez ouvert un nouveau ticket pour le service " . $service->getName());
@@ -64,6 +66,7 @@ class TicketController extends AbstractController
     #[Route('/see/{id}', name: 'app_ticket_see')]
     public function see(EntityManagerInterface $registry, $id): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -85,6 +88,7 @@ class TicketController extends AbstractController
     #[Route('/open/{id}', name: 'app_ticket_open')]
     public function open(Request $request, EntityManagerInterface $registry, $id): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -101,7 +105,7 @@ class TicketController extends AbstractController
                 if ($form->isSubmitted() && $form->isValid()) {
                     $treatment->setTicket($ticket);
                     $treatment->setUser($user);
-                    $treatment->setStartDate(new \DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
+                    $treatment->setStartDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
                     $treatment->setStatus("EN COURS");
                     $registry->persist($treatment);
                     $registry->flush();
@@ -124,6 +128,7 @@ class TicketController extends AbstractController
     #[Route('/open/{id}/relayed/{treatment}', name: 'app_ticket_relayed')]
     public function relayed(EntityManagerInterface $registry, $id, $treatment): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -133,7 +138,7 @@ class TicketController extends AbstractController
             $treatment = $registry->getRepository(Treatment::class)->find($treatment);
             if ($treatment == null) return $this->redirectToRoute("app_ticket_see", ['id' => $id]);
             $treatment->setStatus("RELAYÉ");
-            $treatment->setEndDate(new \DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
+            $treatment->setEndDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
             $registry->persist($treatment);
             $registry->flush();
             $this->addFlash('success', 'Vous avez pris le relais pour le traitement du ticket.');
@@ -149,6 +154,7 @@ class TicketController extends AbstractController
     #[Route('/close/{id}', name: 'app_ticket_close')]
     public function close(Request $request, EntityManagerInterface $registry, $id): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -157,9 +163,9 @@ class TicketController extends AbstractController
         if ($ticket->getService()->getId() == $user->getService()->getId()) {
             if ($request->request->has('closeReason') && $request->request->has("_csrf_token") && $this->isCsrfTokenValid('close-ticket' . $ticket->getId(), $request->request->get('_csrf_token'))) {
                 $ticket->getTreatments()->last()->setStatus('Fermé');
-                $ticket->getTreatments()->last()->setEndDate(new \DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
+                $ticket->getTreatments()->last()->setEndDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
                 $ticket->setResult($request->request->get('closeReason'));
-                $ticket->setResultDate(new \DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
+                $ticket->setResultDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
                 $registry->persist($ticket);
                 $registry->flush();
                 $this->addFlash('success', "Ticket fermé avec succès ! Merci d'avoir pris le temps de le résoudre !");
@@ -176,6 +182,7 @@ class TicketController extends AbstractController
     #[Route('/transfer/{id}/for/{service}', name: 'app_ticket_transfer')]
     public function transfer(EntityManagerInterface $registry, $id, $service): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) $this->redirectToRoute("app_login");
         $user = $registry->getRepository(User::class)->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
 
@@ -188,7 +195,7 @@ class TicketController extends AbstractController
             $ticket->setService($service);
             $ticket->setTransfered(true);
             $ticket->getTreatments()->last()->setStatus("TRANSFÉRÉ // EN ATTENTE");
-            $datetime = new \DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE']));
+            $datetime = new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE']));
             $ticket->setProblem("Transféré par le service " . $user->getService()->getName() . " le " . $datetime->format("d/m/Y H:i") . " | " . $ticket->getProblem());
             $registry->persist($ticket);
             $registry->flush();

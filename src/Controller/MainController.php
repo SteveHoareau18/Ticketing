@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -35,6 +36,7 @@ class MainController extends AbstractController
     #[Route('/', name: 'app_main')]
     public function index(Request $request, ManagerRegistry $managerRegistry): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) return $this->redirectToRoute("app_login"); //Redirige l'utilisateur vers la page de connexion s'il n'est pas connecté
         $serviceLst = $managerRegistry->getRepository(Service::class)->findAll();//Sert pour le mode admin
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';//Système de filtre pour les tickets
@@ -61,6 +63,7 @@ class MainController extends AbstractController
     #[Route('/mes-tickets', name: 'app_main_my_tickets')]
     public function myTickets(Request $request, ManagerRegistry $managerRegistry): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) return $this->redirectToRoute("app_login");
         $myTickets = $managerRegistry->getRepository(Ticket::class)->findBy(['creator' => $this->getUser()]);
         $status = $request->query->has('status') ? str_replace('_', ' ', $request->query->get('status')) : 'EN ATTENTE';
@@ -84,11 +87,12 @@ class MainController extends AbstractController
      * @param EntityManagerInterface $manager
      * @param UserPasswordHasherInterface $hasher
      * @return Response
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws TransportExceptionInterface
      */
     #[Route('/mot-de-passe-oublie', name: 'app_lost_password')]
     public function lostPassword(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
     {
+        set_time_limit(0);
         if ($this->getUser()) return $this->redirectToRoute("app_main");
         if ($request->request->has('inputEmail') && $request->request->has('_csrf_token') && $this->isCsrfTokenValid('lost-password', $request->request->get('_csrf_token'))) {
             $user = $manager->getRepository(User::class)->findOneBy(['email' => $request->request->get('inputEmail')]);
@@ -138,6 +142,7 @@ class MainController extends AbstractController
     #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST'])]//on tolère uniquement les requêtes POST
     public function apiCount(Request $request, EntityManagerInterface $manager, $service): JsonResponse
     {
+        set_time_limit(0);
         if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('api-count' . $service, $request->request->get('_csrf_token'))) {//On vérifie la validité du jeton
             $service = $manager->getRepository(Service::class)->find($service);
             if ($service != null) {
@@ -176,6 +181,7 @@ class MainController extends AbstractController
     #[Route('/api/count-tickets-user/{user}/', name: 'app_api_count_tickets_user', methods: ['POST'])]
     public function apiUser(Request $request, EntityManagerInterface $manager, $user): JsonResponse
     {
+        set_time_limit(0);
         if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('api-count-user' . $user, $request->request->get('_csrf_token'))) {
             $user = $manager->getRepository(User::class)->find($user);
             if ($user != null) {

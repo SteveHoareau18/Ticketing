@@ -8,6 +8,8 @@ use App\Entity\Service;
 use App\Entity\Ticket;
 use App\Entity\Treatment;
 use App\Service\MailService;
+use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +36,7 @@ class HistoricController extends AbstractController
     #[Route('/by-service/{service}', name: 'app_historic_by_service')]
     public function historicByService(EntityManagerInterface $registry, $service): Response
     {
+        set_time_limit(0);
         if ($registry->getRepository(Service::class)->find($service) == null) return $this->redirectToRoute("app_main");
         $service = $registry->getRepository(Service::class)->find($service);
 
@@ -52,6 +55,7 @@ class HistoricController extends AbstractController
     #[Route('/by-service/{service}/see/{id}', name: 'app_historic_by_service_see_ticket')]
     public function historicByServiceSeeTicket(EntityManagerInterface $registry, $service, $id): Response
     {
+        set_time_limit(0);
         if ($registry->getRepository(Service::class)->find($service) == null) return $this->redirectToRoute("app_main");
         if ($registry->getRepository(Ticket::class)->find($id) == null) return $this->redirectToRoute('app_main');
         $service = $registry->getRepository(Service::class)->find($service);
@@ -70,6 +74,7 @@ class HistoricController extends AbstractController
     #[Route('/by-service/{service}/relance/{id}/treatment/{treatment}', name: 'app_historic_by_service_relance_treatment_for_ticket')]
     public function historicRelanceTreatmentForTicket(Request $request, EntityManagerInterface $registry, $service, $id, $treatment): Response
     {
+        set_time_limit(0);
         if ($registry->getRepository(Service::class)->find($service) == null) return $this->redirectToRoute("app_main");
         if ($registry->getRepository(Ticket::class)->find($id) == null) return $this->redirectToRoute('app_main');
         if ($registry->getRepository(Treatment::class)->find($treatment) == null) return $this->redirectToRoute("app_main");
@@ -85,14 +90,14 @@ class HistoricController extends AbstractController
                 $relance->setTreatment($treatment)->
                 setUser($this->getUser())->
                 setReason($request->request->get('relanceReason'))->
-                setRelanceDate(new \DateTime("now", new \DateTimeZone($_ENV['DATETIMEZONE'])));
+                setRelanceDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])));
                 $relance->setReopen(false);
                 if ($request->request->has('reopen')) {
                     $relance->setReopen(true);
                     $newTreatment = (new Treatment())->
                     setTicket($ticket)->
                     setUser($this->getUser())->
-                    setStartDate(new \DateTime("now", new \DateTimeZone($_ENV['DATETIMEZONE'])))->
+                    setStartDate(new DateTime("now", new DateTimeZone($_ENV['DATETIMEZONE'])))->
                     setStatus("Ré-ouvert (admin)")->
                     setObservations($relance->getReason())->
                     setEndDate(null);

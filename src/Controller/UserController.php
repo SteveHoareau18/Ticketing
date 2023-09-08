@@ -34,6 +34,7 @@ class UserController extends AbstractController
     #[Route('/', name: 'app_user')]
     public function index(UserRepository $repository): Response
     {
+        set_time_limit(0);
         $users = $repository->findAll();
         $usersArr = array();
         foreach ($users as $user) {
@@ -50,6 +51,7 @@ class UserController extends AbstractController
     #[Route('/new', name: 'app_user_new')]
     public function new(Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
     {
+        set_time_limit(0);
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -110,6 +112,7 @@ class UserController extends AbstractController
     #[Route('/see/{username}', name: 'app_user_see')]
     public function see(EntityManagerInterface $manager, $username): Response
     {
+        set_time_limit(0);
         $user = $manager->getRepository(User::class)->findOneBy(['username' => $username]);
         if ($user == null) {
             return $this->redirectToRoute("app_user");
@@ -128,6 +131,7 @@ class UserController extends AbstractController
     #[Route('/edit/{username}', name: 'app_user_edit')]
     public function edit(Request $request, EntityManagerInterface $manager, $username): Response
     {
+        set_time_limit(0);
         $user = $manager->getRepository(User::class)->findOneBy(['username' => $username]);
         if ($user == null) {
             return $this->redirectToRoute("app_user");
@@ -172,6 +176,7 @@ class UserController extends AbstractController
     #[Route('/delete/{username}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, EntityManagerInterface $manager, $username): Response
     {
+        set_time_limit(0);
         $user = $manager->getRepository(User::class)->findOneBy(['username' => $username]);
         if ($user != null) {
             if ($request->request->has("_csrf_token") && $this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_csrf_token'))) {

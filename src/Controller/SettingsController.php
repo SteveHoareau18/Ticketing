@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,6 +28,7 @@ class SettingsController extends AbstractController
     #[Route('/', name: 'app_settings')]
     public function settings(): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) return $this->redirectToRoute("app_login");
         return $this->render('settings.html.twig', []);
     }
@@ -36,11 +38,12 @@ class SettingsController extends AbstractController
      * @param UserPasswordHasherInterface $hasher
      * @param EntityManagerInterface $manager
      * @return Response
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws TransportExceptionInterface
      */
     #[Route('/changer-de-mot-passe', name: 'app_settings_reset_password', methods: ['POST'])]
     public function resetPassword(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $manager): Response
     {
+        set_time_limit(0);
         if (!$this->getUser()) return $this->redirectToRoute("app_login");
         if ($request->request->has('_csrf_token') && $this->isCsrfTokenValid('random-password' . $this->getUser()->getUserIdentifier(), $request->request->get('_csrf_token'))) {
             $password = (new RandomPasswordService())->getRandomStrenghPassword();
