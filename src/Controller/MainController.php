@@ -160,7 +160,7 @@ class MainController extends AbstractController
                     }
                 }
 
-                dump(array($nWaiting, $nInProgress, $nClose));
+//                dump(array($nWaiting, $nInProgress, $nClose));
                 return new JsonResponse(array($nWaiting, $nInProgress, $nClose));//on retourne un JsonResponse d'un array de chaque compteur
             }
         }

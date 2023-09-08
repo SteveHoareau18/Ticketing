@@ -86,6 +86,7 @@ class HistoricController extends AbstractController
                 setUser($this->getUser())->
                 setReason($request->request->get('relanceReason'))->
                 setRelanceDate(new \DateTime("now", new \DateTimeZone($_ENV['DATETIMEZONE'])));
+                $relance->setReopen(false);
                 if ($request->request->has('reopen')) {
                     $relance->setReopen(true);
                     $newTreatment = (new Treatment())->
