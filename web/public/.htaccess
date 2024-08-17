@@ -1,0 +1,26 @@
+# BEGIN Symfony
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirige les requêtes vers le front controller index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# END Symfony
+
+# Configuration de la sécurité
+<IfModule mod_headers.c>
+    # Éviter que les fichiers ne soient consultés directement
+    <FilesMatch "\.(php|phar)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Configuration du cache
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+</IfModule>
