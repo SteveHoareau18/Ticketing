@@ -9,4 +9,5 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 }
+
 date_default_timezone_set($_ENV["DATETIMEZONE"]);
