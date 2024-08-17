@@ -22,12 +22,12 @@ class Service
     private Collection $tickets;
 
     #[ORM\OneToMany(mappedBy: 'service', targetEntity: User::class)]
-    private Collection $Users;
+    private Collection $users;
 
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
-        $this->Users = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,15 +80,15 @@ class Service
     /**
      * @return Collection<int, User>
      */
-    public function getUsers(): Collection
+    public function getusers(): Collection
     {
-        return $this->Users;
+        return $this->users;
     }
 
     public function addUser(User $user): static
     {
-        if (!$this->Users->contains($user)) {
-            $this->Users->add($user);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
             $user->setService($this);
         }
 
@@ -97,7 +97,7 @@ class Service
 
     public function removeUser(User $user): static
     {
-        if ($this->Users->removeElement($user)) {
+        if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
             if ($user->getService() === $this) {
                 $user->setService(null);

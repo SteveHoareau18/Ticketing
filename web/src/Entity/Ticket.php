@@ -16,7 +16,7 @@ class Ticket
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ticket')]
+    #[ORM\ManyToOne(inversedBy: 'tickets')]
     private ?Service $service = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -73,14 +73,6 @@ class Ticket
         $this->createDate = $createDate;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Treatment>
-     */
-    public function getTreatments(): Collection
-    {
-        return $this->treatments;
     }
 
     public function addTreatment(Treatment $treatment): static
@@ -165,8 +157,17 @@ class Ticket
         return $this;
     }
 
-    public function getStatus(): string{
-        if(sizeof($this->getTreatments())==0 || !$this->getTreatments()->last()) return "EN ATTENTE";
+    public function getStatus(): string
+    {
+        if (sizeof($this->getTreatments()) == 0 || !$this->getTreatments()->last()) return "EN ATTENTE";
         return $this->getTreatments()->last()->getStatus();
+    }
+
+    /**
+     * @return Collection<int, Treatment>
+     */
+    public function getTreatments(): Collection
+    {
+        return $this->treatments;
     }
 }

@@ -18,7 +18,7 @@ class Treatment
     #[ORM\JoinColumn(nullable: false)]
     private ?Ticket $ticket = null;
 
-    #[ORM\ManyToOne(inversedBy: 'treatments')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'treatments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $caterer = null;
 

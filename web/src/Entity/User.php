@@ -39,10 +39,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 25)]
     private ?string $firstname = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Users')]
+    #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Service $service = null;
 
-    #[ORM\OneToMany(mappedBy: 'User', targetEntity: Treatment::class)]
+    #[ORM\OneToMany(mappedBy: 'caterer', targetEntity: Treatment::class)]
     private Collection $treatments;
 
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Ticket::class)]
