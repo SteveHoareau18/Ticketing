@@ -2,7 +2,7 @@
 La plateforme de tickets permettant aux services des entreprises de créer et traiter des tâches par le biais de ticket.
 
 # Logiciels requis
-- [DockerDesktop]("https://docs.docker.com/desktop/install/windows-install/")
+- [DockerDesktop](https://docs.docker.com/desktop/install/windows-install/)
 - [GitScm]("https://git-scm.com/")
 - [PhpStorm]("https://www.jetbrains.com/phpstorm/")
 - [HeidiSql]("https://www.heidisql.com/download.php")
