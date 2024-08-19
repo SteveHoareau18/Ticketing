@@ -1,0 +1,24 @@
+name: Check if dependent branch is merged
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check-branch-merged:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if dependent branch is merged
+        env:
+          DEPENDENT_BRANCH: ${{ secrets.DEPENDENT_BRANCH }}
+        run: |
+          if git merge-base --is-ancestor origin/$DEPENDENT_BRANCH HEAD; then
+            echo "Branch $DEPENDENT_BRANCH is merged"
+          else
+            echo "Branch $DEPENDENT_BRANCH is not merged"
+            exit 1
+          fi
