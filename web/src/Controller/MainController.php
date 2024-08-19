@@ -150,9 +150,9 @@ class MainController extends AbstractController
             $stmt = $conn->prepare('CALL count_tickets_service(:serviceId)');
             $result = $stmt->executeQuery(['serviceId' => $service])->fetchAssociative();
             return new JsonResponse([
-                $result['in_progress'],  // tickets en attente ou en cours
-                $result['closed'],       // tickets fermés
-                $result['total']         // total des tickets
+                $result['in_waiting'],  // tickets en attente ou en cours
+                $result['in_progress'],       // tickets fermés
+                $result['close']         // total des tickets
             ]);
         }
         return new JsonResponse(500);
