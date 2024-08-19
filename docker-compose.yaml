@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.2
+    container_name: ticketing_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ticketing
+      MYSQL_USER: ticketing
+      MYSQL_PASSWORD: ticketing
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  symfony:
+    container_name: ticketing_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - symfony_data:/var/www/symfony
+    ports:
+      - "8080:8080"
+      - "22:22"
+    depends_on:
+      - mysql  
+
+volumes:
+  mysql_data:
+  symfony_data:
