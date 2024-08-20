@@ -68,7 +68,5 @@ jobs:
       - name: Run tests
         working-directory: web
         run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml.dist
-          
-          # Exécution de run_tests.php
-          php tests/run_tests.php
+          php bin/console c:c --env=test
+          php bin/phpunit
