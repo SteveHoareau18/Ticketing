@@ -70,9 +70,3 @@ jobs:
         run: |
           ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > /dev/null 2>&1
           php tests/run_tests.php
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: phpunit-results
-          path: web/tests/_output
