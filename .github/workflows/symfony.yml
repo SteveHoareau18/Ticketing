@@ -1,0 +1,78 @@
+name: Symfony Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: symfony_test
+          MYSQL_USER: symfony
+          MYSQL_PASSWORD: symfony
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, pdo, pdo_mysql, gd, intl
+          ini-values: |
+            date.timezone=UTC
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Node.js dependencies
+        working-directory: web
+        run: |
+          npm install
+          npm run build
+
+      - name: Install Composer
+        working-directory: web
+        run: |
+          curl -sS https://getcomposer.org/installer | php
+          mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: Install PHP dependencies
+        working-directory: web
+        run: |
+          composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Set up database
+        working-directory: web
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON symfony_test.* TO 'symfony'@'%';"
+          mysql -h 127.0.0.1 -u root -prootpassword -e "FLUSH PRIVILEGES;"
+          mysql -h 127.0.0.1 -u root -prootpassword -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+
+      - name: Run migrations
+        working-directory: web
+        run: |
+          php bin/console doctrine:s:u --env=test --complete --force
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: Run tests
+        working-directory: web
+        run: |
+          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > /dev/null 2>&1
+          php tests/run_tests.php
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpunit-results
+          path: web/tests/_output
