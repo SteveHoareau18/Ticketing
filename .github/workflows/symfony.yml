@@ -11,9 +11,9 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: symfony_test
-          MYSQL_USER: symfony
-          MYSQL_PASSWORD: symfony
+          MYSQL_DATABASE: ticketing_test
+          MYSQL_USER: ticketing
+          MYSQL_PASSWORD: ticketing
         ports:
           - 3306:3306
 
@@ -55,7 +55,7 @@ jobs:
       - name: Set up database
         working-directory: web
         run: |
-          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON symfony_test.* TO 'symfony'@'%';"
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON ticketing_test.* TO 'ticketing'@'%';"
           mysql -h 127.0.0.1 -u root -prootpassword -e "FLUSH PRIVILEGES;"
           mysql -h 127.0.0.1 -u root -prootpassword -e "SET GLOBAL log_bin_trust_function_creators = 1;"
 
