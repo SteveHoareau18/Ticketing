@@ -68,26 +68,20 @@ jobs:
       - name: Run tests
         working-directory: web
         run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > /dev/null 2>&1
+          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > phpunit.log 2>&1
+          
+          # Vérification de la génération du fichier junit.xml
           if [ ! -f junit.xml ]; then
             echo "Erreur: Le fichier junit.xml n'a pas été généré"
             ls -la
+            cat phpunit.log  # Afficher les logs en cas d'erreur
             exit 1
-          fi
-          echo "junit.xml a été généré"
-          php tests/run_tests.php
-        shell: /usr/bin/bash -e {0}
-
-      - name: Check junit.xml content
-        if: always()
-        working-directory: web
-        run: |
-          if [ -f junit.xml ]; then
-            echo "Contenu de junit.xml:"
-            cat junit.xml
           else
-            echo "junit.xml n'existe pas"
+            echo "junit.xml a été généré"
           fi
+          
+          # Exécution de run_tests.php
+          php tests/run_tests.php
 
       - name: Check run_tests.php content
         if: always()
@@ -95,14 +89,3 @@ jobs:
         run: |
           echo "Contenu de tests/run_tests.php:"
           cat tests/run_tests.php
-
-      - name: Display test results
-        if: always()
-        working-directory: web
-        run: |
-          if [ -f test_results.csv ]; then
-            echo "Contenu de test_results.csv:"
-            cat test_results.csv
-          else
-            echo "test_results.csv n'existe pas"
-          fi
