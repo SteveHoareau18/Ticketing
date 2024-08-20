@@ -68,24 +68,7 @@ jobs:
       - name: Run tests
         working-directory: web
         run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > phpunit.log 2>&1
-          
-          # Vérification de la génération du fichier junit.xml
-          if [ ! -f junit.xml ]; then
-            echo "Erreur: Le fichier junit.xml n'a pas été généré"
-            ls -la
-            cat phpunit.log  # Afficher les logs en cas d'erreur
-            exit 1
-          else
-            echo "junit.xml a été généré"
-          fi
+          ./vendor/bin/phpunit --configuration phpunit.xml.dist
           
           # Exécution de run_tests.php
           php tests/run_tests.php
-
-      - name: Check run_tests.php content
-        if: always()
-        working-directory: web
-        run: |
-          echo "Contenu de tests/run_tests.php:"
-          cat tests/run_tests.php
