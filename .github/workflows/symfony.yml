@@ -68,5 +68,5 @@ jobs:
       - name: Run tests
         working-directory: web
         run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml
+          ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > /dev/null 2>&1
           php tests/run_tests.php
