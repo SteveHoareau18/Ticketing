@@ -1,28 +1,35 @@
 <?php
+
 $xml = simplexml_load_file('junit.xml');
-$csv = fopen('test_results.csv', 'w');
 
-fputcsv($csv, ['Test Name', 'Status']);
-
-foreach ($xml->xpath('//testcase') as $testcase) {
-    $testName = $testcase['name'];
-    $status = 'Passed';
-
-    if ($testcase->failure) {
-        $status = 'Failed';
-    } elseif ($testcase->error) {
-        $status = 'Error';
-    } elseif ($testcase->skipped) {
-        $status = 'Skipped';
-    }
-
-    fputcsv($csv, [$testName, $status]);
+if ($xml === false) {
+    echo "Erreur: Impossible de charger le fichier junit.xml\n";
+    exit(1);
 }
 
-fclose($csv);
+$totalTests = (int)$xml['tests'];
+$failures = (int)$xml['failures'];
+$errors = (int)$xml['errors'];
+$skipped = (int)$xml['skipped'];
 
-echo "CSV file 'test_results.csv' has been created.\n";
+$passed = $totalTests - $failures - $errors - $skipped;
 
-// Afficher le contenu du CSV
-$content = file_get_contents('test_results.csv');
-echo $content;
+echo "Résumé des tests :\n";
+echo "Total des tests : $totalTests\n";
+echo "Réussis : $passed\n";
+echo "Échoués : $failures\n";
+echo "Erreurs : $errors\n";
+echo "Ignorés : $skipped\n";
+
+if ($failures > 0 || $errors > 0) {
+    echo "\nTests échoués :\n";
+    foreach ($xml->xpath('//testcase[failure or error]') as $testcase) {
+        $className = (string)$testcase['class'];
+        $testName = (string)$testcase['name'];
+        echo "- $className::$testName\n";
+    }
+    exit(1);
+} else {
+    echo "\nTous les tests ont réussi !\n";
+    exit(0);
+}
