@@ -1,5 +1,0 @@
-"Test Name",Status
-testCreateTicket,Failed
-testViewTicket,Passed
-testOpenTicketWithTreatment,Error
-testCloseTicket,Failed
