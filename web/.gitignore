@@ -25,3 +25,6 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+junit.xml
+test_results.csv
