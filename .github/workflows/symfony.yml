@@ -69,4 +69,9 @@ jobs:
         working-directory: web
         run: |
           ./vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit junit.xml > /dev/null 2>&1
+          if [ ! -f junit.xml ]; then
+            echo "Erreur: Le fichier junit.xml n'a pas été généré"
+            exit 1
+          fi
           php tests/run_tests.php
+        shell: /usr/bin/bash -e {0}
