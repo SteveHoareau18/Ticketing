@@ -33,8 +33,8 @@ docker compose up -d
 - Créer ou accéder à votre branche de développement
 
 # Après un développement
-- Tester le bon fonctionnement de votre code
-- Créer des Tests Unitaires
+- Test le bon fonctionnement de votre code
+- Créer des [Tests Unitaires](tests.md)
 (Vous pouvez utiliser les informations `root:rootpassword@localhost:3306` pour créer une base de donnée de test)
 - Créer un version de migration lorsque des entitées ont été crées ou modifiées `php bin/console make:migration` (et n'oubliez pas de les compléter)
 - Engager vos modifications
