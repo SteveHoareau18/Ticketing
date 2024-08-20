@@ -197,7 +197,7 @@ class TicketControllerTest extends WebTestCase
 
         $user = $userRepository->findOneBy(['email' => 'another-test@example.com']);
 
-        if (!$user){
+        if (!$user) {
             $user = new User();
             $user->setEmail('another-test@example.com');
             $user->setUsername('anotheruser');

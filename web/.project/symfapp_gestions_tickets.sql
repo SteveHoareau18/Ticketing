@@ -7,9 +7,11 @@
 -- Version du serveur : 8.0.31
 -- Version de PHP : 8.0.26
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET
+SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET
+time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT = @@CHARACTER_SET_CLIENT */;
@@ -30,19 +32,48 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `mail_configuration`;
 CREATE TABLE IF NOT EXISTS `mail_configuration`
 (
-    `id`           int                                                           NOT NULL AUTO_INCREMENT,
-    `login`        varchar(150) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `password`     varchar(150) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `smtp_address` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `smtp_port`    varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci  NOT NULL,
-    `smtp_tls`     tinyint(1)                                                    NOT NULL,
-    `cc_address`   varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `subject`      varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 2
-  DEFAULT CHARSET = utf8mb3
-  COLLATE = utf8mb3_unicode_ci;
+    `id`
+    int
+    NOT
+    NULL
+    AUTO_INCREMENT,
+    `login`
+    varchar
+(
+    150
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `password` varchar
+(
+    150
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `smtp_address` varchar
+(
+    255
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `smtp_port` varchar
+(
+    10
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `smtp_tls` tinyint
+(
+    1
+) NOT NULL,
+    `cc_address` varchar
+(
+    255
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `subject` varchar
+(
+    255
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    PRIMARY KEY
+(
+    `id`
+)
+    ) ENGINE = InnoDB
+    AUTO_INCREMENT = 2
+    DEFAULT CHARSET = utf8mb3
+    COLLATE = utf8mb3_unicode_ci;
 
 --
 -- Déchargement des données de la table `mail_configuration`
@@ -62,20 +93,56 @@ VALUES (1, 'stevehoareau18.dev@gmail.com', 'vQ3mm0PxgQTQtLg', 'smtp.freesmtpserv
 DROP TABLE IF EXISTS `messenger_messages`;
 CREATE TABLE IF NOT EXISTS `messenger_messages`
 (
-    `id`           bigint                                                        NOT NULL AUTO_INCREMENT,
-    `body`         longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci     NOT NULL,
-    `headers`      longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci     NOT NULL,
-    `queue_name`   varchar(190) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `created_at`   datetime                                                      NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-    `available_at` datetime                                                      NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+    `id`
+    bigint
+    NOT
+    NULL
+    AUTO_INCREMENT,
+    `body`
+    longtext
+    CHARACTER
+    SET
+    utf8mb3
+    COLLATE
+    utf8mb3_unicode_ci
+    NOT
+    NULL,
+    `headers`
+    longtext
+    CHARACTER
+    SET
+    utf8mb3
+    COLLATE
+    utf8mb3_unicode_ci
+    NOT
+    NULL,
+    `queue_name`
+    varchar
+(
+    190
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+    `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+    `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
     `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
-    PRIMARY KEY (`id`),
-    KEY `IDX_75EA56E0FB7336F0` (`queue_name`),
-    KEY `IDX_75EA56E0E3BD61CE` (`available_at`),
-    KEY `IDX_75EA56E016BA31DB` (`delivered_at`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3
-  COLLATE = utf8mb3_unicode_ci;
+    PRIMARY KEY
+(
+    `id`
+),
+    KEY `IDX_75EA56E0FB7336F0`
+(
+    `queue_name`
+),
+    KEY `IDX_75EA56E0E3BD61CE`
+(
+    `available_at`
+),
+    KEY `IDX_75EA56E016BA31DB`
+(
+    `delivered_at`
+)
+    ) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb3
+    COLLATE = utf8mb3_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -86,20 +153,54 @@ CREATE TABLE IF NOT EXISTS `messenger_messages`
 DROP TABLE IF EXISTS `relance`;
 CREATE TABLE IF NOT EXISTS `relance`
 (
-    `id`           int                                                       NOT NULL AUTO_INCREMENT,
-    `treatment_id` int                                                       NOT NULL,
-    `user_id`      int                                                       NOT NULL,
-    `reason`       longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-    `email`        varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-    `reopen`       tinyint(1)                                                NOT NULL,
-    `relance_date` datetime                                                  NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UNIQ_50BBC126471C0366` (`treatment_id`),
-    KEY `IDX_50BBC126A76ED395` (`user_id`)
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 4
-  DEFAULT CHARSET = utf8mb3
-  COLLATE = utf8mb3_unicode_ci;
+    `id`
+    int
+    NOT
+    NULL
+    AUTO_INCREMENT,
+    `treatment_id`
+    int
+    NOT
+    NULL,
+    `user_id`
+    int
+    NOT
+    NULL,
+    `reason`
+    longtext
+    CHARACTER
+    SET
+    utf8mb3
+    COLLATE
+    utf8mb3_unicode_ci
+    NOT
+    NULL,
+    `email`
+    varchar
+(
+    255
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+    `reopen` tinyint
+(
+    1
+) NOT NULL,
+    `relance_date` datetime NOT NULL,
+    PRIMARY KEY
+(
+    `id`
+),
+    UNIQUE KEY `UNIQ_50BBC126471C0366`
+(
+    `treatment_id`
+),
+    KEY `IDX_50BBC126A76ED395`
+(
+    `user_id`
+)
+    ) ENGINE = InnoDB
+    AUTO_INCREMENT = 4
+    DEFAULT CHARSET = utf8mb3
+    COLLATE = utf8mb3_unicode_ci;
 
 --
 -- Déchargement des données de la table `relance`

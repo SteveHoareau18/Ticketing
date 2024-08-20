@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\MailConfiguration;
 use App\Entity\Service;
 use App\Entity\Ticket;
-use App\Entity\Treatment;
 use App\Entity\User;
 use App\Service\MailService;
 use App\Service\RandomPasswordService;
@@ -150,9 +149,9 @@ class MainController extends AbstractController
             $stmt = $conn->prepare('CALL count_tickets_service(:serviceId)');
             $result = $stmt->executeQuery(['serviceId' => $service])->fetchAssociative();
             return new JsonResponse([
-                $result['in_waiting'],
-                $result['in_progress'],
-                $result['closed']]
+                    $result['in_waiting'],
+                    $result['in_progress'],
+                    $result['closed']]
             );
         }
         return new JsonResponse(array(500, "CSRF invalid"));
