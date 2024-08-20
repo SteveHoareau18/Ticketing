@@ -150,12 +150,12 @@ class MainController extends AbstractController
             $stmt = $conn->prepare('CALL count_tickets_service(:serviceId)');
             $result = $stmt->executeQuery(['serviceId' => $service])->fetchAssociative();
             return new JsonResponse([
-                $result['in_waiting'],  // tickets en attente ou en cours
-                $result['in_progress'],       // tickets fermés
-                $result['close']         // total des tickets
-            ]);
+                $result['in_waiting'],
+                $result['in_progress'],
+                $result['closed']]
+            );
         }
-        return new JsonResponse(500);
+        return new JsonResponse(array(500, "CSRF invalid"));
     }
 
     /**
@@ -179,6 +179,6 @@ class MainController extends AbstractController
                 $result['n_close']
             ]);
         }
-        return new JsonResponse(500);
+        return new JsonResponse(array(500, "CSRF invalid"));
     }
 }
