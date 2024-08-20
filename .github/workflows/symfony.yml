@@ -69,5 +69,5 @@ jobs:
         working-directory: web
         run: |
           php bin/console c:c --env=test
-          php bin/phpunit
+          php bin/phpunit --coverage-html coverage --log-junit junit.xml --quiet
         continue-on-error: true
