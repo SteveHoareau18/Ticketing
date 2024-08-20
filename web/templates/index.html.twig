@@ -94,7 +94,7 @@
                     }
                 },
                 error: function (error) {//il peut avoir une erreur
-                    console.error('Erreur lors de la requête. ' + error);
+                    console.error('Erreur lors de la requête. ' + error.toString());
                 }
             });
 
@@ -105,7 +105,7 @@
                     labels: [],
                     datasets: [{
                         label: '',
-                        data: [1, 1, 1],//défaut 3 types de valeur 1, c'est le poids que ça prendra dans le diagramme
+                        data: [0, 0, 0],//défaut 3 types de valeur 0, c'est le poids que ça prendra dans le diagramme
                         backgroundColor: [
                             'rgb(224, 61, 97)',
                             'rgb(164, 199, 239)',

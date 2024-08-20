@@ -22,6 +22,18 @@ final class Version20240817113102 extends AbstractMigration
         $this->addSql("DELETE FROM doctrine_migration_versions WHERE version LIKE '%Version20240817113102';");
 
         $this->addSql('
+        DROP TRIGGER IF EXISTS treatment_after_update;
+        ');
+
+        $this->addSql('
+        DROP PROCEDURE IF EXISTS count_tickets_service;
+        ');
+
+        $this->addSql('
+        DROP PROCEDURE IF EXISTS count_tickets_user;
+        ');
+
+        $this->addSql('
         CREATE TRIGGER IF NOT EXISTS `treatment_after_update` AFTER UPDATE ON `treatment` FOR EACH ROW 
         BEGIN
              UPDATE ticket
@@ -47,7 +59,7 @@ final class Version20240817113102 extends AbstractMigration
                 COUNT(CASE WHEN t.id NOT IN (SELECT DISTINCT ticket_id FROM treatment)
                             OR latest_treatment.status = 'EN ATTENTE' THEN 1 END) AS in_waiting,
                 COUNT(CASE WHEN latest_treatment.status = 'EN COURS' THEN 1 END) AS in_progress,
-                COUNT(CASE WHEN latest_treatment.status = 'TERMINÉ' THEN 1 END) AS closed
+                COUNT(CASE WHEN latest_treatment.status = 'Fermé' THEN 1 END) AS closed
             FROM ticket t
             LEFT JOIN (
                 SELECT ticket_id, status
@@ -68,7 +80,7 @@ final class Version20240817113102 extends AbstractMigration
             SELECT 
             (SELECT COUNT(*) FROM treatment WHERE caterer_id = userId) AS n_open,
             (SELECT COUNT(*) FROM ticket WHERE creator_id = userId) AS n_create,
-            (SELECT COUNT(*) FROM treatment t JOIN ticket ti ON t.ticket_id = ti.id WHERE t.caterer_id = userId AND t.end_date = ti.result_date AND t.`status` = "TERMINÉ") AS n_close;
+            (SELECT COUNT(*) FROM treatment t JOIN ticket ti ON t.ticket_id = ti.id WHERE t.caterer_id = userId AND t.end_date = ti.result_date AND t.`status` = "Fermé") AS n_close;
         END
         ');
     }
