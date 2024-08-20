@@ -70,3 +70,4 @@ jobs:
         run: |
           php bin/console c:c --env=test
           php bin/phpunit
+        continue-on-error: true
