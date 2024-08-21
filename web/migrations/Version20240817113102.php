@@ -26,6 +26,10 @@ final class Version20240817113102 extends AbstractMigration
         ');
 
         $this->addSql('
+        DROP TRIGGER IF EXISTS treatment_after_insert;
+        ');
+
+        $this->addSql('
         DROP PROCEDURE IF EXISTS count_tickets_service;
         ');
 
@@ -70,6 +74,45 @@ final class Version20240817113102 extends AbstractMigration
             WHERE ticket.id = NEW.ticket_id;
         END       
         ');
+
+        $this->addSql('
+        CREATE TRIGGER IF NOT EXISTS `treatment_after_insert` AFTER INSERT ON `treatment` FOR EACH ROW 
+        BEGIN
+            UPDATE ticket
+            SET 
+                ticket.result_date = (
+                    SELECT MAX(treatment.end_date)
+                    FROM treatment
+                    WHERE treatment.ticket_id = NEW.ticket_id
+                      AND treatment.end_date IS NOT NULL
+                ),
+                ticket.result = (
+                    CASE
+                        WHEN (
+                            SELECT COUNT(*)
+                            FROM treatment
+                            WHERE treatment.ticket_id = NEW.ticket_id
+                              AND treatment.end_date IS NOT NULL
+                        ) > 0
+                        THEN (
+                            SELECT treatment.observations
+                            FROM treatment
+                            WHERE treatment.end_date = (
+                                SELECT MAX(treatment.end_date)
+                                FROM treatment
+                                WHERE treatment.ticket_id = NEW.ticket_id
+                                  AND treatment.end_date IS NOT NULL
+                            )
+                              AND treatment.ticket_id = NEW.ticket_id
+                            LIMIT 1
+                        )
+                        ELSE NULL
+                    END
+                )
+            WHERE ticket.id = NEW.ticket_id;
+        END       
+        ');
+
         $this->addSql("
         CREATE PROCEDURE IF NOT EXISTS  count_tickets_service(IN serviceId INT)
         BEGIN
