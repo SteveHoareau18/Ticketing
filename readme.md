@@ -1,6 +1,6 @@
 # Plateforme Ticketing
 
-La plateforme de tickets permettant aux services des entreprises de créer et traiter des tâches par le biais de ticket.
+La plateforme de tickets permettant aux services des entreprises de créer et traiter des tâches par le biais de tickets.
 
 # Logiciels requis
 
@@ -11,7 +11,7 @@ La plateforme de tickets permettant aux services des entreprises de créer et tr
 
 # Installation du projet
 
-- Récuperer le projet:
+- Récupérer le projet:
 
 ```sh
 git clone <repo>
@@ -35,7 +35,7 @@ docker compose up -d
 
 (Éteindre l'environnement si nécessaire: `docker compose down`)
 
-# Commencer le développment
+# Commencer le développement
 
 - Ouvrir PhpStorm
 - Se connecter en remote développement en utilisant les informations `symfony@localhost` et le mot de passe `symfony`
