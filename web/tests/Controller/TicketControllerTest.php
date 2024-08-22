@@ -264,6 +264,120 @@ class TicketControllerTest extends WebTestCase
         $this->entityManager->flush();
     }
 
+    public function testTransferTicket()
+    {
+        $user = $this->createUserAndLogin();
+        $originalService = $this->createService();
+        $user->setService($originalService);
+        $this->entityManager->flush();
+
+        $ticket = new Ticket();
+        $ticket->setCreator($user);
+        $ticket->setService($originalService);
+        $ticket->setProblem('Problème de test');
+        $ticket->setCreateDate(new \DateTime());
+        $ticket->setTransfered(false);
+        $this->entityManager->persist($ticket);
+
+        $treatment = new Treatment();
+        $treatment->setTicket($ticket);
+        $treatment->setUser($user);
+        $treatment->setStartDate(new \DateTime());
+        $treatment->setStatus('EN COURS');
+        $this->entityManager->persist($treatment);
+
+        $newService = new Service();
+        $newService->setName('New Test Service');
+        $this->entityManager->persist($newService);
+
+        $this->entityManager->flush();
+
+        // Request the transfer
+        $this->client->request('GET', '/transfer/' . $ticket->getId() . '/for/' . $newService->getId());
+
+        // Assert redirection
+        $this->assertResponseRedirects('/');
+
+        // Refresh the ticket entity
+        $this->entityManager->refresh($ticket);
+
+        // Assert the ticket was transferred
+        $this->assertTrue($ticket->isTransfered());
+        $this->assertEquals($newService->getId(), $ticket->getService()->getId());
+        $this->assertStringContainsString('Transféré par le service', $ticket->getProblem());
+
+        $lastTreatment = $ticket->getTreatments()->last();
+        $this->assertEquals("TRANSFÉRÉ // EN ATTENTE", $lastTreatment->getStatus());
+    }
+
+    public function testTransferTicketToSameService()
+    {
+        $user = $this->createUserAndLogin();
+        $service = $this->createService();
+        $user->setService($service);
+        $this->entityManager->flush();
+
+        $ticket = new Ticket();
+        $ticket->setCreator($user);
+        $ticket->setService($service);
+        $ticket->setProblem('Problème de test');
+        $ticket->setCreateDate(new \DateTime());
+        $ticket->setTransfered(false);
+        $this->entityManager->persist($ticket);
+        $this->entityManager->flush();
+
+        // Try to transfer to the same service
+        $this->client->request('GET', '/transfer/' . $ticket->getId() . '/for/' . $service->getId());
+
+        // Assert redirection to main page (transfer should not occur)
+        $this->assertResponseRedirects('/');
+
+        // Refresh the ticket entity
+        $this->entityManager->refresh($ticket);
+
+        // Assert the ticket was not transferred
+        $this->assertFalse($ticket->isTransfered());
+        $this->assertEquals($service->getId(), $ticket->getService()->getId());
+    }
+
+    public function testTransferTicketWithoutPermission()
+    {
+        $user = $this->createUserAndLogin();
+        $userService = $this->createService();
+        $user->setService($userService);
+
+        $otherService = new Service();
+        $otherService->setName('Other Service');
+        $this->entityManager->persist($otherService);
+
+        $ticket = new Ticket();
+        $ticket->setCreator($user);
+        $ticket->setService($otherService);  // Set a different service than the user's
+        $ticket->setProblem('Problème de test');
+        $ticket->setCreateDate(new \DateTime());
+        $ticket->setTransfered(false);
+        $this->entityManager->persist($ticket);
+
+        $newService = new Service();
+        $newService->setName('New Test Service');
+        $this->entityManager->persist($newService);
+
+        $this->entityManager->flush();
+
+        // Try to transfer the ticket
+        $this->client->request('GET', '/transfer/' . $ticket->getId() . '/for/' . $newService->getId());
+
+        // Assert redirection to main page (transfer should not occur)
+        $this->assertResponseRedirects('/');
+
+        // Refresh the ticket entity
+        $this->entityManager->refresh($ticket);
+
+        // Assert the ticket was not transferred
+        $this->assertFalse($ticket->isTransfered());
+        $this->assertEquals($otherService->getId(), $ticket->getService()->getId());
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
