@@ -8,6 +8,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TicketType extends AbstractType
 {
@@ -20,7 +22,18 @@ class TicketType extends AbstractType
                 'attr' => ['class' => 'input input-bordered', 'placeholder' => 'Le client CL001 a besoin de...'],
                 "mapped" => true,
                 "required" => true,
-                "trim" => true
+                "trim" => true,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'La raison de l\'ouverture du ticket ne peut pas être vide.',
+                    ]),
+                    new Length([
+                        'min' => 10,
+                        'minMessage' => 'La raison doit contenir au moins {{ limit }} caractères.',
+                        'max' => 500,
+                        'maxMessage' => 'La raison ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
             ->add('service', TextType::class, [
                 "label" => "Service",
@@ -28,7 +41,7 @@ class TicketType extends AbstractType
                 'attr' => ['class' => 'input input-bordered', 'placeholder' => 'Rechercher...', 'list' => 'serviceLst'],
                 "mapped" => false,
                 "required" => true,
-                "trim" => true
+                "trim" => true,
             ]);
     }
 

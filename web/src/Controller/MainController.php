@@ -134,11 +134,16 @@ class MainController extends AbstractController
 //    #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST','GET'])] -> pour tester
 
     /**
-     * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param $service
-     * @return JsonResponse
-     * @throws Exception
+     * Counts and returns the number of tickets for a specific service.
+     *
+     * This POST-only endpoint uses a stored procedure to get counts for tickets in waiting, in progress, and closed states.
+     * It validates the CSRF token before executing the procedure.
+     *
+     * @param Request $request The HTTP request with CSRF token.
+     * @param EntityManagerInterface $manager The entity manager.
+     * @param int $service The service ID.
+     * @return JsonResponse JSON response with ticket counts.
+     * @throws Exception If an error occurs.
      */
     #[Route('/api/count-tickets/{service}/', name: 'app_api_count_tickets_service', methods: ['POST'])]//on tolère uniquement les requêtes POST
     public function apiCount(Request $request, EntityManagerInterface $manager, $service): JsonResponse
@@ -158,11 +163,13 @@ class MainController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param $user
-     * @return JsonResponse
-     * @throws Exception
+     * Count tickets associated with a specific user via a stored procedure.
+     *
+     * @param Request $request HTTP request containing user data.
+     * @param EntityManagerInterface $manager Manages database interactions.
+     * @param int|string $user The user ID to count tickets for.
+     * @return JsonResponse JSON response containing ticket counts.
+     * @throws Exception Throws exception on database or CSRF issues.
      */
     #[Route('/api/count-tickets-user/{user}/', name: 'app_api_count_tickets_user', methods: ['POST'])]
     public function apiUser(Request $request, EntityManagerInterface $manager, $user): JsonResponse
