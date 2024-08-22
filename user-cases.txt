@@ -1,38 +1,47 @@
 @startuml
 left to right direction
 
+package {
 actor "Utilisateur Régulier" as User
 actor "Administrateur" as Admin
-actor "Système" as System
+}
 
 usecase "Se connecter" as UC1
 usecase "Réinitialiser le mot de passe" as UC2
+
+rectangle user_rights {
 usecase "Créer un ticket" as UC3
 usecase "Suivre un ticket" as UC4
 usecase "Prendre en charge un ticket" as UC5
 usecase "Transférer un ticket" as UC6
 usecase "Clore un ticket" as UC7
+}
+
+rectangle admin_rights {
 usecase "Afficher les statistiques de tickets par service" as UC8
 usecase "Gérer les comptes utilisateurs" as UC9
 usecase "Afficher les statistiques de tickets par utilisateur" as UC10
-usecase "Récupérer le nombre de tickets par service" as UC11
-usecase "Récupérer le nombre de tickets par utilisateur" as UC12
-User --> UC1
-Admin --> UC1
-User --> UC2
-Admin --> UC2
-UC10 --> System
-System --> UC11
-System --> UC12
+}
+
+Admin --|> User 
+User -down-> UC1
+User -down-> UC2
+User -down-> UC3
+User -down-> UC4
+User -down-> UC5
+User -down-> UC6
+User -down-> UC7
+Admin -down-> UC8
+Admin -down-> UC9
+Admin -down-> UC10
 
 ' Connexion obligatoire
-UC1 ..> UC3 : << include >>
-UC1 ..> UC4 : << include >>
-UC1 ..> UC5 : << include >>
-UC1 ..> UC6 : << include >>
-UC1 ..> UC7 : << include >>
-UC1 ..> UC8 : << include >>
-UC1 ..> UC9 : << include >>
-UC1 ..> UC10 : << include >>
-
+UC1 <.down. UC3 : << include >>
+UC1 <.down. UC4 : << include >>
+UC1 <.down. UC5 : << include >>
+UC1 <.down. UC6 : << include >>
+UC1 <.down. UC7 : << include >>
+UC1 <.down. UC8 : << include >>
+UC1 <.down. UC9 : << include >>
+UC1 <.down. UC10 : << include >>
 @enduml
