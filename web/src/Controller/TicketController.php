@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TicketController extends AbstractController
 {
     /**
+     * Handles the creation of a new ticket.
      * @throws Exception
      */
     #[Route('/new', name: 'app_ticket_new')]
