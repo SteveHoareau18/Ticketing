@@ -1,0 +1,31 @@
+ID Test;Nom du Test;Conditions préalables;Étapes du test;Résultats attendus
+1;Connexion utilisateur régulier;Aucun;1. Accéder à la page de connexion.;L'utilisateur est redirigé vers la page d'accueil avec le statut 'Connecté'.
+;;2. Saisir les identifiants valides d'un utilisateur régulier.;;
+;;3. Cliquer sur 'Se connecter'.;;
+2;Connexion administrateur;Aucun;1. Accéder à la page de connexion.;L'administrateur est redirigé vers le tableau de bord avec le statut 'Connecté'.
+;;2. Saisir les identifiants valides d'un administrateur.;;
+;;3. Cliquer sur 'Se connecter'.;;
+3;Déconnexion utilisateur;L'utilisateur doit être connecté.;1. Accéder au menu utilisateur.;L'utilisateur est redirigé vers la page de connexion avec le statut 'Déconnecté'.
+;;2. Cliquer sur 'Se déconnecter'.;;
+4;Réinitialisation du mot de passe;Aucun;1. Accéder à la page de connexion.;L'utilisateur reçoit un email avec un nouveau mot de passe généré aléatoirement.
+;;2. Cliquer sur 'Mot de passe oublié'.;;
+;;3. Saisir l'adresse email et soumettre.;;
+5;Création de ticket utilisateur régulier;L'utilisateur doit être connecté.;1. Accéder à la section 'Créer un ticket'.;Le ticket est créé et affiché dans la liste des tickets avec le statut 'EN ATTENTE'.
+;;2. Saisir les informations du ticket (raison, service).;;
+;;3. Soumettre le formulaire de création.;;
+6;Suivi de ticket utilisateur régulier;L'utilisateur doit avoir des tickets assignés.;1. Accéder à la section 'Mes tickets'.;L'utilisateur peut visualiser les processus et statuts associés à chaque ticket.
+7;Prise en charge d'un ticket en attente;L'utilisateur doit être connecté et avoir un ticket avec le statut 'EN ATTENTE'.;1. Accéder à la section 'Mes tickets'.;Le ticket passe au statut 'EN COURS' et est assigné à l'utilisateur.
+;;2. Sélectionner un ticket avec le statut 'EN ATTENTE'.;;
+;;3. Cliquer sur 'Prendre en charge'.;;
+8;Clôture d'un ticket;L'utilisateur doit être connecté et avoir un ticket en cours.;1. Accéder à la section 'Mes tickets'.;Le ticket est marqué comme 'FERMÉ'.
+;;2. Sélectionner un ticket avec le statut 'EN COURS'.;;
+;;3. Cliquer sur 'Clôturer le ticket'.;;
+9;Transfert d'un ticket;L'utilisateur doit être connecté et avoir un ticket en cours.;1. Accéder à la section 'Mes tickets'.;Le ticket est marqué comme 'TRANSFÉRÉ // EN ATTENTE' et assigné au nouveau service.
+;;2. Sélectionner un ticket avec le statut 'EN COURS'.;;
+;;3. Cliquer sur 'Transférer' et choisir un service. ;;
+10;Accès au tableau de bord administrateur;L'administrateur doit être connecté.;1. Accéder à la section 'Tableau de bord'.;L'administrateur visualise les statistiques des états des tickets par service.
+11;Gestion des utilisateurs par l'administrateur;L'administrateur doit être connecté.;1. Accéder à la section 'Gestion des utilisateurs'.;L'administrateur peut créer, modifier, ou supprimer des utilisateurs.
+;;2. Créer, modifier ou supprimer un utilisateur.;;
+12;Accès aux statistiques utilisateur par administrateur;L'administrateur doit être connecté.;1. Accéder à la section 'Statistiques utilisateurs'.;L'administrateur visualise le nombre de tickets 'Créé', 'Ouvert', 'Fermé' pour chaque utilisateur.
+13;Récupération du nombre de tickets par service;Aucun;1. Exécuter la procédure de récupération du nombre de tickets par service.;Le nombre de tickets par service est affiché correctement.
+14;Récupération du nombre de tickets par utilisateur;Aucun;1. Exécuter la procédure de récupération du nombre de tickets par utilisateur.;Le nombre de tickets par utilisateur est affiché correctement.
