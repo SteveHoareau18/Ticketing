@@ -49,7 +49,7 @@ docker compose up -d
 - Test le bon fonctionnement de votre code
 - Créer des [Tests Unitaires](tests.md)
   (Vous pouvez utiliser les informations `root:rootpassword@localhost:3306` pour créer une base de donnée de test)
-- Créer un version de migration lorsque des entitées ont été crées ou modifiées `php bin/console make:migration` (et
+- Créer une version de migration lorsque des entitées ont été crées ou modifiées `php bin/console make:migration` (et
   n'oubliez pas de les compléter)
 - Engager vos modifications
 - Pousser le contenu de votre branche sur le répertoire distant GitHub
