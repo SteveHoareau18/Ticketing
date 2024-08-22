@@ -18,13 +18,11 @@
     {% endif %}
     <div>
         {% if "ROLE_ADMIN" in app.user.roles %}
-            {#        Mode admin #}
             <div>
                 {% if dashboard == true %}
-                    {#            Affichage du dashboard #}
                     <h1 class="text-center font-extrabold m-3">Tableau de bord administratif</h1>
                     <div class="grid grid-cols-3 gap-4">
-                        {% for service in serviceLst %}{# on parcours la liste des service donné en paramètre lors du rendu de la vue depuis le controller #}
+                        {% for service in serviceLst %}
                             <div class="bg-gray-300 rounded-lg p-4">
                                 <a href="{{ path('app_historic_by_service',{'service':service.id}) }}">{# Possibilité de cliquer pour avoir + d'information #}
                                     <div class="text-center">
@@ -32,15 +30,15 @@
                                     </div>
                                     <div class="chart-container"
                                          style="position: relative; height:40vh; width:80vw; margin-left: 20%">
-                                        <canvas id="canvaService{{ service.id }}"></canvas> {# canvas qui se génère après le chargement du contenu du DOM -> Voir <script> en bas #}
+                                        <canvas id="canvaService{{ service.id }}"></canvas>
                                     </div>
                                     <div class="mt-1 grid grid-cols-3 justify-center justify-items-center">
                                         <span id="waitingBadgeIdService{{ service.id }}"
                                               class="badge badge-error">-</span>{# Nombre de tickets en attente qui se met à jour après le chargement du contenu du DOM #}
                                         <span id="inProgressBadgeIdService{{ service.id }}"
-                                              class="badge badge-info">-</span>{# Nombre de tickets en cours qui se met à jour après le chargement du contenu du DOM #}
+                                              class="badge badge-info">-</span>
                                         <span id="closeBadgeIdService{{ service.id }}"
-                                              class="badge badge-success">-</span>{# Nombre de tickets fermés qui se met à jour après le chargement du contenu du DOM #}
+                                              class="badge badge-success">-</span>
                                     </div>
                                 </a>
                             </div>
